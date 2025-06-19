@@ -1,15 +1,25 @@
 local lib = require("auto-fix-return.lib")
 
-local M = {
-  config = {
+local M = {}
+
+---@class AutoFixReturnConfig
+---@field enable_autocmds boolean
+
+---@return AutoFixReturnConfig
+function M.get_default_config()
+  local config = {
     enable_autocmds = true,
-  },
-}
+  }
 
+  return config
+end
+
+---@param config AutoFixReturnConfig
 M.setup = function(config)
-  M.config = vim.tbl_deep_extend("force", M.config, config)
+  local default_config = M.get_default_config()
+  local final_config = vim.tbl_deep_extend("force", default_config, config)
 
-  if M.config.enable_autocmds then
+  if final_config.enable_autocmds then
     lib.enable_autocmds()
   end
 

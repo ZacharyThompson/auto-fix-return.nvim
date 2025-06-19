@@ -1,5 +1,8 @@
 .DS_Store
 
+# Ignore test dependencies
+testbin/
+
 # Compiled Lua sources
 luac.out
 

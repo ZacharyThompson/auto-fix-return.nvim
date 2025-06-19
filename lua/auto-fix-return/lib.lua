@@ -17,7 +17,6 @@ M.setup_user_commands = function()
 end
 
 M.enable_autocmds = function()
-
   if command_id ~= 0 then
     vim.notify("AutoFixReturn autocommands already enabled", vim.log.levels.INFO)
     return
@@ -29,8 +28,7 @@ M.enable_autocmds = function()
   )
 end
 
-M.disable_autocomds = function()
-
+function M.disable_autocomds()
   if command_id == 0 then
     vim.notify("AutoFixReturn autocommands already disabled", vim.log.levels.INFO)
     return
@@ -40,89 +38,171 @@ M.disable_autocomds = function()
   command_id = 0
 end
 
-M.wrap_golang_return = function()
-  if vim.bo.filetype ~= "go" then
-    return
-  end
-
-  -- This query attempts to match all valid and also most common invalid or inprogress syntax trees for a function declaration
-  -- short_var_declaration is for the edge case of named returns
-  -- EXAMPLE: func foo() err error { }
+function M.parse_function()
   local query_str = [[
   [
-      (
-         ;; The default case for most method/function declarations, they are the only ones that have the named field "result" 
-         ;; so we can generally rely on that to be accurate with the (ERROR) tokens preceeding or proceeding it to give us the
-         ;; complete range of the intended return declaration
-	       (_
-		       (ERROR)? @error_start 
-		       result: (_) @result 
-		       (ERROR)? @error_end
-         ) 
-         ;; The in progress parse tree for interface method declarations places the error token
-         ;; one level up in the tree
-         ;; type: (interface_type ; [15, 9] - [17, 1]
-         ;;   (method_elem ; [16, 2] - [16, 11]
-         ;;     name: (field_identifier) ; [16, 2] - [16, 5]
-         ;;     parameters: (parameter_list) ; [16, 5] - [16, 7]
-         ;;     result: (type_identifier)) ; [16, 8] - [16, 11]
-         ;;   (ERROR)))) ; [16, 11] - [16, 12]
-         ;; We need to handle this case specifically so we anchor it to the ancestor node for interface
-         (
-           (ERROR)? @error_interface_end (#has-parent? @error_interface_end interface_type)
-         )
-      )  
-      ;; This is a weird edgecase in regards to handling multi returns, an in progress multireturn on a top level function is
-      ;; parsed intermediately as a short_var_declaration so we have to anchor it to the actual function declaration itself
-      ;; to prevent incorrect matches on non method syntaxes E.G a for loop
-      (
-        (function_declaration)
-        (short_var_declaration 
-            left: (expression_list
-                (identifier) @named_result
-                (ERROR (identifier) @error_end)?
-            )
-        )
-      )
+    (ERROR
+       (function_declaration
+         _?
+         (ERROR)? @error_start 
+         result: (_) @result 
+         (ERROR)? @error_end
+         body: (_)? @body
+       ) 
+    ) @outside_error_start
+   (function_declaration
+     _?
+     (ERROR)? @error_start 
+     result: (_) @result 
+     (ERROR)? @error_end
+     body: (_)? @body
+   ) 
+   (ERROR)? @outside_error_end
   ]
   ]]
 
+  local cursor_row, _ = unpack(vim.api.nvim_win_get_cursor(0))
+  -- cursor coordinates need to be converted from row native 1 indexed to 0 indexed for treesitter
+  cursor_row = cursor_row - 1
   local query = vim.treesitter.query.parse("go", query_str)
-  local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
 
-  -- We make sure to call the entire parse again to make sure we have the most up to date tree
-  -- NOTE: without this the bugs are a bit nasty
-  local tree = vim.treesitter.get_parser(0):parse(true)[1]
+  local tree = vim.treesitter.get_parser(0):parse(false)[1]
 
-  local final_start_row, final_start_col, final_end_row, final_end_col = 0, 0, 0, 0
+  local final_start_col, final_end_col = 0, 0
 
   for id, node, _, _ in query:iter_captures(tree:root(), 0) do
-    local start_row, _, end_row, end_col = node:range()
+    local capture_name = query.captures[id]
+    local start_row, start_col, end_row, end_col = node:range()
 
-    if cursor_row < start_row + 1 or cursor_row > end_row + 1 then
+    -- Multiline return statements are very finicky to parse correctly
+    -- we need to incrememnt the row here because treesitter ranges start at 0 and
+    -- nvim line numbers start at 1
+    if cursor_row ~= start_row or cursor_row ~= end_row then
       goto continue
     end
 
-    local capture_name = query.captures[id]
+    -- vim.print(query.captures[id])
 
-    -- If we find a start error then we know we are possibly doing a named return
     if capture_name == "error_start" then
-      final_start_row, final_start_col, final_end_row, final_end_col = node:range()
-    elseif capture_name == "result" and final_end_row == 0 then
-      final_start_row, final_start_col, final_end_row, final_end_col = node:range()
-    elseif capture_name == "named_result" then
-      final_end_col = end_col + 1
-      final_end_row = end_row
-    elseif capture_name == "result" and final_end_row ~= 0 then
+      final_start_col = start_col
+    elseif capture_name == "result" then
+      -- As result is the middle result if either start or end
+      -- are already set we should do nothing
+      if final_start_col == 0 then
+        final_start_col = start_col
+      end
+
+      if final_end_col == 0 then
+        final_end_col = end_col
+      end
+    -- The parse tree for `func Foo() int,|` contains the ERROR object OUTSIDE the function_declaration
+    -- which contains the final trailing comma so we match this here to extend our match to include the typed comma
+    elseif capture_name == "error_end" or capture_name == "outside_error_start" or capture_name == "outside_error_end" then
       final_end_col = end_col
-      final_end_row = end_row
-    elseif capture_name == "error_end" or capture_name == "error_interface_end" then
-      final_end_col = end_col
-      final_end_row = end_row
     end
 
     ::continue::
   end
+
+  return cursor_row, final_start_col, cursor_row, final_end_col
+end
+
+---@class TextGrid
+---@field start_row number
+---@field start_col number
+---@field end_row number
+---@field end_col number
+
+---@class ParseFixValues
+---@field grid TextGrid
+---@field text_value string
+---@field final_cursor_column number
+
+---@return ParseFixValues?
+function M.parse_return()
+  -- This query attempts to match all valid and also most common invalid or inprogress syntax trees for a function declaration
+  -- short_var_declaration is for the edge case of named returns
+  -- EXAMPLE: func foo() err error { }
+  -- local query_str = [[
+  -- [
+  --     (
+  --        ;; The default case for most method/function declarations, they are the only ones that have the named field "result"
+  --        ;; so we can generally rely on that to be accurate with the (ERROR) tokens preceeding or proceeding it to give us the
+  --        ;; complete range of the intended return declaration
+  --       (_
+  --        (ERROR)? @error_start
+  --        result: (_) @result
+  --        (ERROR)? @error_end
+  --        )
+  --        ;; The in progress parse tree for interface method declarations places the error token
+  --        ;; one level up in the tree
+  --        ;; type: (interface_type ; [15, 9] - [17, 1]
+  --        ;;   (method_elem ; [16, 2] - [16, 11]
+  --        ;;     name: (field_identifier) ; [16, 2] - [16, 5]
+  --        ;;     parameters: (parameter_list) ; [16, 5] - [16, 7]
+  --        ;;     result: (type_identifier)) ; [16, 8] - [16, 11]
+  --        ;;   (ERROR)))) ; [16, 11] - [16, 12]
+  --        ;; We need to handle this case specifically so we anchor it to the ancestor node for interface
+  --        (
+  --          (ERROR)? @error_interface_end (#has-parent? @error_interface_end interface_type)
+  --        )
+  --     )
+  --     ;; This is a weird edgecase in regards to handling multi returns, an in progress multireturn on a top level function is
+  --     ;; parsed intermediately as a short_var_declaration so we have to anchor it to the actual function declaration itself
+  --     ;; to prevent incorrect matches on non method syntaxes E.G a for loop
+  --     (
+  --       (function_declaration)
+  --       (short_var_declaration
+  --           left: (expression_list
+  --               (identifier) @named_result
+  --               (ERROR (identifier) @error_end)?
+  --           )
+  --       )
+  --     )
+  -- ]
+  -- ]]
+  --
+  -- local query = vim.treesitter.query.parse("go", query_str)
+  local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
+  -- cursor coordinates need to be converted from row native 1 indexed to 0 indexed for treesitter
+  cursor_row = cursor_row - 1
+  --
+  -- -- We make sure to call the entire parse again to make sure we have the most up to date tree
+  -- -- NOTE: without this the bugs are a bit nasty
+  -- local tree = vim.treesitter.get_parser(0):parse(true)[1]
+  --
+  -- local final_start_row, final_start_col, final_end_row, final_end_col = 0, 0, 0, 0
+  --
+  -- for id, node, _, _ in query:iter_captures(tree:root(), 0) do
+  --   local start_row, _, end_row, end_col = node:range()
+  --
+  --   -- Multiline return statements are very finicky to parse correctly
+  --   if cursor_row < start_row + 1 or cursor_row > end_row + 1 then
+  --     goto continue
+  --   end
+  --
+  --   local capture_name = query.captures[id]
+  --
+  --   -- If we find a start error then we know we are possibly doing a named return
+  --   if capture_name == "error_start" then
+  --     final_start_row, final_start_col, final_end_row, final_end_col = node:range()
+  --   elseif capture_name == "result" and final_end_row == 0 then
+  --     final_start_row, final_start_col, final_end_row, final_end_col = node:range()
+  --   elseif capture_name == "named_result" then
+  --     final_end_col = end_col + 1
+  --     final_end_row = end_row
+  --   elseif capture_name == "result" and final_end_row ~= 0 then
+  --     final_end_col = end_col
+  --     final_end_row = end_row
+  --   elseif capture_name == "error_end" or capture_name == "error_interface_end" then
+  --     final_end_col = end_col
+  --     final_end_row = end_row
+  --   end
+  --
+  --   ::continue::
+  -- end
+
+  local final_start_row, final_start_col, final_end_row, final_end_col = M.parse_function()
 
   local line = vim.api.nvim_buf_get_text(
     0,
@@ -153,6 +233,7 @@ M.wrap_golang_return = function()
   local function trim_end(s)
     return s:gsub("%s+$", "")
   end
+
   -- If we do not have any commas we might still be doing a named return
   -- `E.G func foo() err e` <- once the e is typed we know a named return has been
   -- initiated and we should split it again,
@@ -167,6 +248,7 @@ M.wrap_golang_return = function()
 
   -- If returns just equals one we know we have a single return and do
   -- not need parenthesis
+  -- Here we also need to set the offset for the CURSOR to be placed after we do the text replacement
   if #returns == 1 then
     final_cursor_col = final_cursor_col - 1
     new_line = value
@@ -175,35 +257,58 @@ M.wrap_golang_return = function()
     new_line = "(" .. value .. ")"
   end
 
-  -- If the line hasnt changed or theres nothing to add then we just bail out here
+  -- If the line has not changed or theres nothing to add then we just bail out here
   if line == new_line then
     return
   end
 
-  -- If the cursor is positioned outside of the immediate return declaration match then we do not want to touch it as this can 
+  -- If the cursor is positioned outside of the immediate return declaration match then we do not want to touch it as this can
   -- cause weird behavior when editing parts of a function that are unrelated to the return declaration and if there is a weird edge that triggers
-  -- 
+  --
   -- We offset the final column start value to avoid edgecases with regards to using 'daw' or similar on a method_declaration
   -- E.G
   --              daw
-  -- func (f Foo) B|ar() int {} 
-  -- -> 
-  -- func (f Foo) () int {} 
+  -- func (f Foo) B|ar() int {}
+  -- ->
+  -- func (f Foo) () int {}
   -- This parse will break without the final_start_col offset
-  if cursor_row < final_start_row + 1 or cursor_row > final_end_row + 1 or cursor_col < final_start_col + 1 or cursor_col > final_end_col then
+  if cursor_col < final_start_col + 1 or cursor_col > final_end_col then
+    return
+  end
+
+  return {
+    grid = {
+      start_row = cursor_row,
+      end_row = cursor_row,
+      start_col = final_start_col,
+      end_col = final_end_col,
+    },
+    text_value = new_line,
+    final_cursor_column = final_cursor_col,
+  }
+end
+
+function M.wrap_golang_return()
+  if vim.bo.filetype ~= "go" then
+    return
+  end
+
+  local parse_fix = M.parse_return()
+
+  if parse_fix == nil then
     return
   end
 
   vim.api.nvim_buf_set_text(
     0,
-    final_start_row,
-    final_start_col,
-    final_end_row,
-    final_end_col,
-    { new_line }
+    parse_fix.grid.start_row,
+    parse_fix.grid.start_col,
+    parse_fix.grid.end_row,
+    parse_fix.grid.end_col,
+    { parse_fix.text_value }
   )
 
-  vim.api.nvim_win_set_cursor(0, { final_end_row + 1, final_cursor_col })
+  vim.api.nvim_win_set_cursor(0, { parse_fix.grid.end_row + 1, parse_fix.final_cursor_column })
 end
 
 return M
