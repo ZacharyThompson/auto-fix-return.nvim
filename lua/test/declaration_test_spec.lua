@@ -50,6 +50,28 @@ describe("test functions with body defined", function()
     end)
   end)
 
+  describe("when a single slice return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() []string| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() []string {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("g", char)
+    end)
+  end)
+
   describe("when a single interface with one space return is started with cursor at the end of the first type", function()
     local winid = 0
     before_each(function()
@@ -378,6 +400,57 @@ describe("test functions with body defined", function()
     it("should set the cursor to inside the parens", function()
       local char = utils.get_cursor_char(winid)
       eq("s", char)
+    end)
+  end)
+
+  describe("when a multi slice return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() []string,| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() ([]string,) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi slice return is started with cursor at the end of the first type and a proceeding valid declaration", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "func Foo() []string,| {}",
+        "func bar() {}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "func Foo() ([]string,) {}",
+        "func bar() {}"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
     end)
   end)
 
@@ -1017,6 +1090,64 @@ describe("test functions without a body defined", function()
     it("should not add parentheses around the return type", function()
       local lines = utils.get_win_lines(winid)
       eq("func Foo() (<-chan i, t)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("t", char)
+    end)
+  end)
+
+  describe("when a multi slice return is started with cursor at the end of the comma and a proceeding valid declaration", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "func foo() []string,|",
+        "func bar() {}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type as the parse tree is completely broken at this point", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "func foo() []string,",
+        "func bar() {}"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi slice return is started with cursor at the end of the second type and a proceeding valid declaration", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "func foo() []string, t|",
+        "func bar() {}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "func foo() ([]string, t)",
+        "func bar() {}"
+      }
+      eq(expected, lines)
     end)
 
     it("should not touch the cursor", function()
