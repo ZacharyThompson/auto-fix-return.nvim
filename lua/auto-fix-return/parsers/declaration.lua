@@ -9,7 +9,7 @@ local M = {}
 -- Parse function declarations and return the definition grid if applicable
 ---@param cursor_row number The cursor row (1-indexed as from nvim_win_get_cursor)
 ---@return TextGrid?
-function M.parse_function(cursor_row)
+function M.parse_declaration(cursor_row)
   -- cursor coordinates need to be converted from row native 1 indexed to 0 indexed for treesitter
   cursor_row = cursor_row - 1
   local query_str = [[
@@ -42,6 +42,37 @@ function M.parse_function(cursor_row)
         .
         ;; The following definition `func Foo() i,|` parses
         ;; with the final error token for the , outside of the function_declaration
+        (ERROR)? @outside_error_end
+      )
+
+      ;; The following code 
+      ;;
+      ;; func (b *Bar) Foo() i, 
+      ;;
+      ;; type foo
+      ;;
+      ;; parses with the error token ABOVE the function declaration 
+      ;; so we handle that in a seperate match
+      (ERROR
+        (method_declaration
+          _?
+          (ERROR)? @error_start
+          result: (_) @result
+          (ERROR)? @error_end
+          body: (_)? @body
+        ) @func
+      ) @outside_error_start
+      (
+        (method_declaration
+          _?
+          (ERROR)? @error_start
+          result: (_) @result
+          (ERROR)? @error_end
+          body: (_)? @body
+        ) @func
+        .
+        ;; The following definition `func (b *Bar) Foo() i,|` parses
+        ;; with the final error token for the , outside of the method_declaration
         (ERROR)? @outside_error_end
       )
     ]

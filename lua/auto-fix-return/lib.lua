@@ -1,4 +1,4 @@
-local _function = require("auto-fix-return.parsers.function")
+local declaration = require("auto-fix-return.parsers.declaration")
 
 local M = {}
 
@@ -197,7 +197,7 @@ function M.parse_return()
   --
   -- local query = vim.treesitter.query.parse("go", query_str)
   local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
-  local return_def_coords = _function.parse_function(cursor_row)
+  local return_def_coords = declaration.parse_declaration(cursor_row)
 
   if return_def_coords == nil then
     return
