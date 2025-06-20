@@ -112,6 +112,7 @@ function M.build_fixed_definition(line, cursor_col)
     --
     -- NOTE: `chan` syntax is unique in that a single return that is a channel type DOES NOT
     -- require parenthesis, this is for all forms of channel including `chan` `<-chan` and `chan<-`
+    -- TODO: This should be rewritten into a more robust parser
     for i = 1, #trimmed do
       local c = trimmed:sub(i, i)
 
