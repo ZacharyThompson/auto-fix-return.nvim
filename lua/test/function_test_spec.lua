@@ -99,6 +99,24 @@ describe("test functions with body defined", function()
     end)
   end)
 
+  describe("when a single chanenl return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = set_test_window_value("func Foo() chan i| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = get_win_lines(winid)
+      eq("func Foo() chan i {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = get_cursor_char(winid)
+      eq("i", char)
+    end)
+  end)
+
   describe("when a single return has parenthesis ", function()
     local winid = 0
     before_each(function()
@@ -126,12 +144,11 @@ describe("test functions with body defined", function()
       )
       vim.cmd("AutoFixReturn")
     end)
-    -- TODO: add test for cursor in "type foo|"
 
-    it("should add parentheses around the return type", function()
+    it("should not add parentheses around the return type as the fix parse contains errors and we are not sure it is safe", function()
       local lines = get_win_lines(winid)
       local expected = {
-        "func Foo() (i,) {}",
+        "func Foo() i, {}",
         "",
         "type foo"
       }
@@ -153,7 +170,6 @@ describe("test functions with body defined", function()
       )
       vim.cmd("AutoFixReturn")
     end)
-    -- TODO: add test for cursor in "type foo|"
 
     it("should not add parentheses around the return type", function()
       local lines = get_win_lines(winid)
@@ -170,6 +186,33 @@ describe("test functions with body defined", function()
       eq("f", char)
     end)
   end)
+
+  describe("when a single return with comma has an invalid proceeding type definition with cursor in the function name", function()
+    local winid = 0
+    before_each(function()
+      winid = set_test_window_value({"func Fo|o() i, {}",
+        "",
+        "type foo"}
+      )
+      vim.cmd("AutoFixReturn")
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = get_win_lines(winid)
+      local expected = {
+        "func Foo() i, {}",
+        "",
+        "type foo"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = get_cursor_char(winid)
+      eq("o", char)
+    end)
+  end)
+
 
   describe(
     "when a single return is started with cursor at the end of the first type with a comma",
@@ -225,6 +268,24 @@ describe("test functions with body defined", function()
     it("not touch the cursor", function()
       local char = get_cursor_char(winid)
       eq("i", char)
+    end)
+  end)
+
+  describe("when a multi return has parenthesis and only one body brace", function()
+    local winid = 0
+    before_each(function()
+      winid = set_test_window_value("func Foo() (i,s) {|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    it("should not modify anything", function()
+      local lines = get_win_lines(winid)
+      eq("func Foo() (i,s) {", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = get_cursor_char(winid)
+      eq("{", char)
     end)
   end)
 
