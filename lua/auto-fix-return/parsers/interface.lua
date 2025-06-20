@@ -2,7 +2,7 @@ local shared = require("auto-fix-return.parsers.shared")
 
 local M = {}
 
--- Parse function and method declarations and return the definition grid if applicable
+-- Parse interface method declarations and return the definition grid if applicable
 ---@param cursor_row number The cursor row (1-indexed as from nvim_win_get_cursor)
 ---@return TextGrid?
 function M.parse_interface(cursor_row)
@@ -10,13 +10,16 @@ function M.parse_interface(cursor_row)
   cursor_row = cursor_row - 1
   local query_str = [[
     [
-		(method_elem
-			name: (_)
-			parameters: (_)
-      (ERROR)? @error_start
-			result: (_) @result
-		) @elem
-		(ERROR) @error_end
+      (
+        (method_elem
+          name: (_)
+          parameters: (_)
+          (ERROR)? @error_start
+          result: (_) @result
+        ) @elem
+        .
+        (ERROR)? @error_end
+      )
 	]
   ]]
 

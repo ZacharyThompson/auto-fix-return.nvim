@@ -255,6 +255,8 @@ function M.parse_return()
     return
   end
 
+  -- vim.print(return_def_coords, line)
+
   -- Here we rebuild the entire return statement to a syntactically correct version
   -- splitting on commas to decide if there is a parameter list or a single value
   local fixed_def = M.build_fixed_definition(line, cursor_col)
