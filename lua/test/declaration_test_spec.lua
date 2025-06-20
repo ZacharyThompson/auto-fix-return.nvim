@@ -1950,6 +1950,35 @@ describe("test methods without a body defined", function()
     end)
   end)
 
+  describe("when a multi slice return is started with cursor at the end of the second type and a proceeding valid declaration", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "func (s *string) foo() []string, t|",
+        "func (s *string) bar() {}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "func (s *string) foo() ([]string, t)",
+        "func (s *string) bar() {}"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("t", char)
+    end)
+  end)
+
   describe("when a multi channel return with multiple channels is started with cursor at the end of the second type", function()
     local winid = 0
     before_each(function()
