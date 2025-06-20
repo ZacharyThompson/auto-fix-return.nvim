@@ -8,7 +8,8 @@ local M = {}
 function M.parse_interface(cursor_row)
   -- cursor coordinates need to be converted from row native 1 indexed to 0 indexed for treesitter
   cursor_row = cursor_row - 1
-  local query_str = [[
+
+  local query = vim.treesitter.query.parse("go", [[
     [
       (
         (method_elem
@@ -22,8 +23,7 @@ function M.parse_interface(cursor_row)
       )
 	]
   ]]
-
-  local query = vim.treesitter.query.parse("go", query_str)
+)
 
   local tree = vim.treesitter.get_parser(0):parse(false)[1]
 
