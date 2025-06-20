@@ -1,10 +1,6 @@
-local M = {}
+local shared = require("auto-fix-return.parsers.shared")
 
----@class TextGrid
----@field start_row number
----@field start_col number
----@field end_row number
----@field end_col number
+local M = {}
 
 -- Parse function and method declarations and return the definition grid if applicable
 ---@param cursor_row number The cursor row (1-indexed as from nvim_win_get_cursor)
@@ -119,19 +115,7 @@ function M.parse_declaration(cursor_row)
   --
   -- We need to know upfront if a given parse is even valid to be fixed
   -- as we dont know the order we will detect the matches in the match iterator
-  local found = false
-  for id, node, _, _ in query:iter_captures(tree:root(), 0) do
-    local capture_name = query.captures[id]
-    if capture_name == "func" then
-      local start_row, _, _, _ = node:range()
-      if cursor_row == start_row then
-        found = true
-        break
-      end
-    end
-  end
-
-  if not found then
+  if not shared.find_node_on_cursor_row(query, tree, cursor_row, "func") then
     return nil
   end
 

@@ -1,4 +1,5 @@
 local declaration = require("auto-fix-return.parsers.declaration")
+local interface = require("auto-fix-return.parsers.interface")
 
 local M = {}
 
@@ -233,6 +234,11 @@ function M.parse_return()
   local return_def_coords = declaration.parse_declaration(cursor_row)
 
   if return_def_coords == nil then
+    return_def_coords = interface.parse_interface(cursor_row)
+  end
+
+  if return_def_coords == nil then
+    vim.notify("AutoFixReturn: No valid return definition found", vim.log.levels.DEBUG)
     return
   end
 
