@@ -196,44 +196,8 @@ function M.parse_return()
   -- ]]
   --
   -- local query = vim.treesitter.query.parse("go", query_str)
-  local _, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
-  --
-  -- -- We make sure to call the entire parse again to make sure we have the most up to date tree
-  -- -- NOTE: without this the bugs are a bit nasty
-  -- local tree = vim.treesitter.get_parser(0):parse(true)[1]
-  --
-  -- local final_start_row, final_start_col, final_end_row, final_end_col = 0, 0, 0, 0
-  --
-  -- for id, node, _, _ in query:iter_captures(tree:root(), 0) do
-  --   local start_row, _, end_row, end_col = node:range()
-  --
-  --   -- Multiline return statements are very finicky to parse correctly
-  --   if cursor_row < start_row + 1 or cursor_row > end_row + 1 then
-  --     goto continue
-  --   end
-  --
-  --   local capture_name = query.captures[id]
-  --
-  --   -- If we find a start error then we know we are possibly doing a named return
-  --   if capture_name == "error_start" then
-  --     final_start_row, final_start_col, final_end_row, final_end_col = node:range()
-  --   elseif capture_name == "result" and final_end_row == 0 then
-  --     final_start_row, final_start_col, final_end_row, final_end_col = node:range()
-  --   elseif capture_name == "named_result" then
-  --     final_end_col = end_col + 1
-  --     final_end_row = end_row
-  --   elseif capture_name == "result" and final_end_row ~= 0 then
-  --     final_end_col = end_col
-  --     final_end_row = end_row
-  --   elseif capture_name == "error_end" or capture_name == "error_interface_end" then
-  --     final_end_col = end_col
-  --     final_end_row = end_row
-  --   end
-  --
-  --   ::continue::
-  -- end
-
-  local return_def_coords = _function.parse_function()
+  local cursor_row, cursor_col = unpack(vim.api.nvim_win_get_cursor(0))
+  local return_def_coords = _function.parse_function(cursor_row)
 
   if return_def_coords == nil then
     return

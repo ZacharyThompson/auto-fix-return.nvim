@@ -108,7 +108,6 @@ describe("test functions with body defined", function()
     end)
   end)
 
-
   describe("when a single channel return is started with cursor at the end of the first type", function()
     local winid = 0
     before_each(function()
@@ -260,6 +259,28 @@ describe("test functions with body defined", function()
     it("should not touch the cursor", function()
       local char = get_cursor_char(winid)
       eq("i", char)
+    end)
+  end)
+
+  describe("when a single return has no name and a valid return definition", function()
+    local winid = 0
+    before_each(function()
+      winid = set_test_window_value("func |() i {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      cleanup_test(winid)
+    end)
+
+    it("should not touch anything", function()
+      local lines = get_win_lines(winid)
+      eq("func () i {}", lines[1])
+    end)
+
+    it("should keep the cursor on the i", function()
+      local char = get_cursor_char(winid)
+      eq(" ", char)
     end)
   end)
 
@@ -618,6 +639,28 @@ describe("test functions without a body defined", function()
     end)
   end)
 
+  describe("when a single return has no name and a valid return definition", function()
+    local winid = 0
+    before_each(function()
+      winid = set_test_window_value("func |() i")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      cleanup_test(winid)
+    end)
+
+    it("should not touch anything", function()
+      local lines = get_win_lines(winid)
+      eq("func () i", lines[1])
+    end)
+
+    it("should keep the cursor on the i", function()
+      local char = get_cursor_char(winid)
+      eq(" ", char)
+    end)
+  end)
+
   describe("when a single return with comma has an valid preceeding type definition with cursor in return definition", function()
     local winid = 0
     before_each(function()
@@ -827,5 +870,92 @@ describe("test functions without a body defined", function()
       eq("t", char)
     end)
   end)
+end)
 
+describe("test non function syntax constructs", function()
+  describe("when editing a for loop initialization", function()
+    local winid = 0
+    before_each(function()
+      winid = set_test_window_value({
+        "package main",
+        "",
+        "import \"fmt\"",
+        "",
+        "func main() {",
+        "  for i:=0|;i<10;i++{",
+        "    fmt.Println(\"Hello\")",
+        "  }",
+        "}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      cleanup_test(winid)
+    end)
+
+    it("should not modify the code", function()
+      local lines = get_win_lines(winid)
+      local expected = {
+        "package main",
+        "",
+        "import \"fmt\"",
+        "",
+        "func main() {",
+        "  for i:=0;i<10;i++{",
+        "    fmt.Println(\"Hello\")",
+        "  }",
+        "}"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = get_cursor_char(winid)
+      eq("0", char)
+    end)
+  end)
+
+  describe("when editing a for loop condition", function()
+    local winid = 0
+    before_each(function()
+      winid = set_test_window_value({
+        "package main",
+        "",
+        "import \"fmt\"",
+        "",
+        "func main() {",
+        "  for i:=0;i<1|0;i++{",
+        "    fmt.Println(\"Hello\")",
+        "  }",
+        "}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      cleanup_test(winid)
+    end)
+
+    it("should not modify the code", function()
+      local lines = get_win_lines(winid)
+      local expected = {
+        "package main",
+        "",
+        "import \"fmt\"",
+        "",
+        "func main() {",
+        "  for i:=0;i<10;i++{",
+        "    fmt.Println(\"Hello\")",
+        "  }",
+        "}"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = get_cursor_char(winid)
+      eq("1", char)
+    end)
+  end)
 end)

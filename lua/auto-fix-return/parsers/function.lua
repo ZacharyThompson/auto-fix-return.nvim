@@ -7,8 +7,11 @@ local M = {}
 ---@field end_col number
 
 -- Parse function declarations and return the definition grid if applicable
+---@param cursor_row number The cursor row (1-indexed as from nvim_win_get_cursor)
 ---@return TextGrid?
-function M.parse_function()
+function M.parse_function(cursor_row)
+  -- cursor coordinates need to be converted from row native 1 indexed to 0 indexed for treesitter
+  cursor_row = cursor_row - 1
   local query_str = [[
     [
       ;; The following code 
@@ -43,10 +46,6 @@ function M.parse_function()
       )
     ]
   ]]
-
-  local cursor_row, _ = unpack(vim.api.nvim_win_get_cursor(0))
-  -- cursor coordinates need to be converted from row native 1 indexed to 0 indexed for treesitter
-  cursor_row = cursor_row - 1
   local query = vim.treesitter.query.parse("go", query_str)
 
   local tree = vim.treesitter.get_parser(0):parse(false)[1]
