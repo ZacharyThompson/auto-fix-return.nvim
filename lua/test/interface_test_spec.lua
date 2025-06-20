@@ -12,7 +12,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
         "  Bar() i|",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -26,7 +26,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         "  Bar() i",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -43,7 +43,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
         "  Bar() i,|",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -57,7 +57,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         "  Bar() (i,)",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -74,7 +74,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
         "  Bar() int, err|",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -88,7 +88,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         "  Bar() (int, err)",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -105,7 +105,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
         "  Bar() chan int|",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -119,7 +119,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         "  Bar() chan int",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -136,7 +136,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
         "  Bar() interface{}|",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -150,7 +150,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         "  Bar() interface{}",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -167,7 +167,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
         "  Bar() (i|)",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -181,7 +181,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         "  Bar() i",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -200,7 +200,7 @@ describe("test interface method declarations", function()
         "  Bar() int, err",
         "  Baz() i,|",
         "  Bax() error",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -216,7 +216,7 @@ describe("test interface method declarations", function()
         "  Bar() int, err",
         "  Baz() (i,)",
         "  Bax() error",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -233,7 +233,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {|",
         "  Bar() int, err",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -247,7 +247,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         "  Bar() int, err",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -264,7 +264,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
         "  Bar() result float64, err er|",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -278,7 +278,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         "  Bar() (result float64, err er)",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -295,7 +295,7 @@ describe("test interface method declarations", function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
         " Bar() map[string][]int, error|",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -309,7 +309,7 @@ describe("test interface method declarations", function()
       local expected = {
         "type Foo interface {",
         " Bar() (map[string][]int, error)",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
