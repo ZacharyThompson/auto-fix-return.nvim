@@ -11,7 +11,7 @@ local M = {}
 ---@param tree TSTree The parse tree root
 ---@param cursor_row number The cursor row (0-indexed for TreeSitter)
 ---@param capture_name string The capture name to look for (e.g., "func", "elem")
----@return boolean found Whether a matching node was found on the cursor row
+---@return boolean found
 function M.find_node_on_cursor_row(query, tree, cursor_row, capture_name)
   for id, node, _, _ in query:iter_captures(tree:root(), 0) do
     local current_capture_name = query.captures[id]
