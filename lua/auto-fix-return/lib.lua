@@ -91,24 +91,33 @@ function M.parse_function()
 
   local final_start_col, final_end_col = 0, 0
 
-  -- find the initial func capture so we can bail out
-  -- if the cursor is not on the same row as `func`
+  -- Find the initial func capture so we can bail out
+  -- if the cursor is not on the same row as a `func`
+  -- 
+  -- We need to know upfront if a given parse is even valid to be fixed 
+  -- as we dont know the order we will detect the matches in the match iterator
+  local found = false
   for id, node, _, _ in query:iter_captures(tree:root(), 0) do
     local capture_name = query.captures[id]
     if capture_name == "func" then
       local start_row, _, _, _= node:range()
-      if cursor_row ~= start_row then
-        return nil      end
+      if cursor_row == start_row then
+        found = true
+        break
+      end
     end
+  end
+
+  if not found then
+    return nil
   end
 
   for id, node, _, _ in query:iter_captures(tree:root(), 0) do
     local capture_name = query.captures[id]
     local start_row, start_col, end_row, end_col = node:range()
 
-    -- Multiline return statements are very finicky to parse correctly
-    -- we need to incrememnt the row here because treesitter ranges start at 0 and
-    -- nvim line numbers start at 1
+    -- We only care about captures that are on the same row as the cursor 
+    -- as multiline returns are tricky to parse correctly
     if cursor_row ~= start_row or cursor_row ~= end_row then
       goto continue
     end
@@ -317,6 +326,7 @@ function M.parse_return()
     -- but `chan` syntax is unique in that a single return that is a channel type DOES NOT
     -- require parenthesis, this is for all forms of channel including `chan` `<-chan` and `chan<-`
     for c in trimmed:gmatch(".") do
+      -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
       if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil) then
         temp_returns[#temp_returns + 1] = curr_word
         curr_word = ""
