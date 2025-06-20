@@ -116,14 +116,14 @@ function M.parse_declaration(cursor_row)
 
   -- Find the initial func capture so we can bail out
   -- if the cursor is not on the same row as a `func`
-  -- 
-  -- We need to know upfront if a given parse is even valid to be fixed 
+  --
+  -- We need to know upfront if a given parse is even valid to be fixed
   -- as we dont know the order we will detect the matches in the match iterator
   local found = false
   for id, node, _, _ in query:iter_captures(tree:root(), 0) do
     local capture_name = query.captures[id]
     if capture_name == "func" then
-      local start_row, _, _, _= node:range()
+      local start_row, _, _, _ = node:range()
       if cursor_row == start_row then
         found = true
         break
@@ -139,7 +139,7 @@ function M.parse_declaration(cursor_row)
     local capture_name = query.captures[id]
     local start_row, start_col, end_row, end_col = node:range()
 
-    -- We only care about captures that are on the same row as the cursor 
+    -- We only care about captures that are on the same row as the cursor
     -- as multiline returns are tricky to parse correctly
     if cursor_row ~= start_row or cursor_row ~= end_row then
       goto continue
@@ -159,8 +159,11 @@ function M.parse_declaration(cursor_row)
       end
     -- The parse tree for `func Foo() int,|` contains the ERROR object OUTSIDE the function_declaration
     -- which contains the final trailing comma so we match this here to extend our match to include the typed comma
-    elseif capture_name == "error_end" or capture_name == "outside_error_start" or capture_name == "outside_error_end" then
-
+    elseif
+      capture_name == "error_end"
+      or capture_name == "outside_error_start"
+      or capture_name == "outside_error_end"
+    then
       -- Rarely the outside error will also include the starting range, see the ts query for the case where this happens
       if final_start_col == 0 then
         final_start_col = start_col

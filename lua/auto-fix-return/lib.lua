@@ -45,11 +45,16 @@ end
 ---@param parse_fix ParseFixValues
 ---@returns boolean
 function M.validate_fix(curr_bufnr, parse_fix)
-
   -- Build a scratch buffer to test the fix first before we apply it to the user buffer
   local new_bufnr = vim.api.nvim_create_buf(true, true)
   vim.bo[new_bufnr].filetype = "go"
-  vim.api.nvim_buf_set_lines(new_bufnr, 0, -1, false, vim.api.nvim_buf_get_lines(curr_bufnr, 0, -1, false))
+  vim.api.nvim_buf_set_lines(
+    new_bufnr,
+    0,
+    -1,
+    false,
+    vim.api.nvim_buf_get_lines(curr_bufnr, 0, -1, false)
+  )
 
   vim.api.nvim_buf_set_text(
     new_bufnr,
@@ -64,7 +69,7 @@ function M.validate_fix(curr_bufnr, parse_fix)
   local tree = vim.treesitter.get_parser(new_bufnr):parse(false)[1]
   local error_found = tree:root():has_error()
 
-  vim.api.nvim_buf_delete(new_bufnr, {force = true})
+  vim.api.nvim_buf_delete(new_bufnr, { force = true })
 
   return not error_found
 end
@@ -93,9 +98,9 @@ function M.build_fixed_definition(line, cursor_col)
   -- initiated and we should lex it again,
   -- however, we need to trim the leading space so we dont surround the return after you have hit space with
   -- JUST a type return
-  -- 
-  -- This section is essentially a small parser for go type decls as a declaration 
-  -- can have arbitrary amount of spaces which can masquarede as a named return 
+  --
+  -- This section is essentially a small parser for go type decls as a declaration
+  -- can have arbitrary amount of spaces which can masquarede as a named return
   if #returns == 1 then
     local trimmed = trim_end(value)
 
@@ -111,7 +116,7 @@ function M.build_fixed_definition(line, cursor_col)
       local c = trimmed:sub(i, i)
 
       if c == "{" or c == "[" then
-        table.insert(bracket_stack, #bracket_stack+1, c)
+        table.insert(bracket_stack, #bracket_stack + 1, c)
       end
       if c == "}" or c == "]" then
         table.remove(bracket_stack, #bracket_stack)
@@ -119,10 +124,9 @@ function M.build_fixed_definition(line, cursor_col)
 
       -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
       if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil) then
-
         -- Peek ahead to find the next non-space character
-        -- so that we can ignore whitespace in return definitions like `interface   {}` 
-        -- we then do a stack approach to ensure we only add a return definition if we have validated 
+        -- so that we can ignore whitespace in return definitions like `interface   {}`
+        -- we then do a stack approach to ensure we only add a return definition if we have validated
         -- that we have gotten to the end of all bracket pairs E.G `string[ interface { } ]`
         local next_char = nil
         for j = i + 1, #trimmed do
@@ -134,7 +138,7 @@ function M.build_fixed_definition(line, cursor_col)
         end
 
         if next_char == "{" or next_char == "[" then
-          table.insert(bracket_stack, #bracket_stack+1, next_char)
+          table.insert(bracket_stack, #bracket_stack + 1, next_char)
         end
 
         -- vim.print(next_char, bracket_stack)
@@ -148,7 +152,7 @@ function M.build_fixed_definition(line, cursor_col)
     end
 
     if curr_word ~= "" then
-        temp_returns[#temp_returns + 1] = curr_word
+      temp_returns[#temp_returns + 1] = curr_word
     end
 
     returns = temp_returns
@@ -268,7 +272,7 @@ function M.parse_return()
   end
 
   return {
-    grid=return_def_coords,
+    grid = return_def_coords,
     text_value = fixed_def.new_line,
     final_cursor_column = fixed_def.final_cursor_col,
   }

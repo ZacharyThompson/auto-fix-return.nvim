@@ -11,7 +11,7 @@ local function get_test_input_cursor_coords(value)
       return i, cursor_pos - 2, true
     end
   end
-  return 0,0,false
+  return 0, 0, false
 end
 
 ---@param value string[]
@@ -45,7 +45,7 @@ end
 ---@return string
 function M.get_cursor_char(winid)
   local row, col = M.get_cursor_coords(winid)
-  local char = M.get_win_lines(winid)[row]:sub(col+1,col+1)
+  local char = M.get_win_lines(winid)[row]:sub(col + 1, col + 1)
   return char
 end
 
@@ -55,7 +55,7 @@ end
 ---@return integer
 function M.set_test_window_value(value)
   if type(value) == "string" then
-    value = {value}
+    value = { value }
   end
 
   local row, col, found = get_test_input_cursor_coords(value)
@@ -66,12 +66,12 @@ function M.set_test_window_value(value)
 
   value = replace_test_input_cursor_value(value)
   local bufnr = vim.api.nvim_create_buf(true, false)
-  local winid = vim.api.nvim_open_win(bufnr, true, {split = 'left',win = 0})
+  local winid = vim.api.nvim_open_win(bufnr, true, { split = "left", win = 0 })
   vim.bo[bufnr].filetype = "go"
 
-  vim.api.nvim_buf_set_lines(bufnr, 0, #value + 1, false,  value)
+  vim.api.nvim_buf_set_lines(bufnr, 0, #value + 1, false, value)
 
-  vim.api.nvim_win_set_cursor(winid, { row, col})
+  vim.api.nvim_win_set_cursor(winid, { row, col })
 
   return winid
 end

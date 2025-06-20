@@ -28,203 +28,230 @@ describe("test functions with body defined", function()
     end)
   end)
 
-  describe("when a single channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() chan i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() chan i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() chan i {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() chan i {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single slice return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() []string| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single slice return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() []string| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() []string {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() []string {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("g", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("g", char)
+      end)
+    end
+  )
 
-  describe("when a single interface with one space return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() interface {}| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single interface with one space return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() interface {}| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() interface {} {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() interface {} {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("}", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 
-  describe("when a single interface with three spaces return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() interface   {}| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single interface with three spaces return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() interface   {}| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() interface   {} {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() interface   {} {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("}", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 
-  describe("when a single send only channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() chan<- i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single send only channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() chan<- i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() chan<- i {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() chan<- i {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single receive only channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() <-chan i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single receive only channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() <-chan i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() <-chan i {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() <-chan i {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single named channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() c chan i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single named channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() c chan i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (c chan i) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (c chan i) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single named send only channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() c chan<- i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single named send only channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() c chan<- i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (c chan<- i) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (c chan<- i) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single named recieve only channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() c <-chan i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single named recieve only channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() c <-chan i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (c <-chan i) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (c <-chan i) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
   describe("when a single return has parenthesis ", function()
     local winid = 0
@@ -270,95 +297,98 @@ describe("test functions with body defined", function()
     end)
   end)
 
-  describe("when a single return with comma has an invalid proceeding type definition with cursor in return definition", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({"func Foo() i,| {}",
-        "",
-        "type foo"}
+  describe(
+    "when a single return with comma has an invalid proceeding type definition with cursor in return definition",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({ "func Foo() i,| {}", "", "type foo" })
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it(
+        "should not add parentheses around the return type as the fix parse contains errors and we are not sure it is safe",
+        function()
+          local lines = utils.get_win_lines(winid)
+          local expected = {
+            "func Foo() i, {}",
+            "",
+            "type foo",
+          }
+          eq(expected, lines)
+        end
       )
-      vim.cmd("AutoFixReturn")
-    end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      it("should make sure the cursor stays in front of the comma", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-    it("should not add parentheses around the return type as the fix parse contains errors and we are not sure it is safe", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func Foo() i, {}",
-        "",
-        "type foo"
-      }
-      eq(expected, lines)
-    end)
+  describe(
+    "when a single return with comma has an invalid proceeding type definition with cursor in invalid type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({ "func Foo() i, {}", "", "type f|oo" })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    it("should make sure the cursor stays in front of the comma", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-  describe("when a single return with comma has an invalid proceeding type definition with cursor in invalid type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({"func Foo() i, {}",
-        "",
-        "type f|oo"}
-      )
-      vim.cmd("AutoFixReturn")
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func Foo() i, {}",
+          "",
+          "type foo",
+        }
+        eq(expected, lines)
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("f", char)
+      end)
+    end
+  )
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func Foo() i, {}",
-        "",
-        "type foo"
-      }
-      eq(expected, lines)
-    end)
+  describe(
+    "when a single return with comma has an invalid proceeding type definition with cursor in the function name",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({ "func Fo|o() i, {}", "", "type foo" })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("f", char)
-    end)
-  end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-  describe("when a single return with comma has an invalid proceeding type definition with cursor in the function name", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({"func Fo|o() i, {}",
-        "",
-        "type foo"}
-      )
-      vim.cmd("AutoFixReturn")
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func Foo() i, {}",
+          "",
+          "type foo",
+        }
+        eq(expected, lines)
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
-
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func Foo() i, {}",
-        "",
-        "type foo"
-      }
-      eq(expected, lines)
-    end)
-
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("o", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("o", char)
+      end)
+    end
+  )
 
   describe(
     "when a single return is started with cursor at the end of the first type with a comma",
@@ -403,173 +433,194 @@ describe("test functions with body defined", function()
     end)
   end)
 
-  describe("when a multi slice return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() []string,| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi slice return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() []string,| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() ([]string,) {}", lines[1])
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() ([]string,) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when a multi slice return is started with cursor at the end of the first type and a proceeding valid declaration", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "func Foo() []string,| {}",
-        "func bar() {}"
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi slice return is started with cursor at the end of the first type and a proceeding valid declaration",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "func Foo() []string,| {}",
+          "func bar() {}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func Foo() ([]string,) {}",
-        "func bar() {}"
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func Foo() ([]string,) {}",
+          "func bar() {}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when there are multiple functions and a multi return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "func Foo() i,| {}",
-        "func Bar() j {}"
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when there are multiple functions and a multi return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "func Foo() i,| {}",
+          "func Bar() j {}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the first function return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func Foo() (i,) {}",
-        "func Bar() j {}"
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the first function return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func Foo() (i,) {}",
+          "func Bar() j {}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when a multi channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() chan i, t| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() chan i, t| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (chan i, t) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (chan i, t) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi channel return with multiple channels is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() chan i, chan t| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi channel return with multiple channels is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() chan i, chan t| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (chan i, chan t) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (chan i, chan t) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi send only channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() chan<- i, t| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi send only channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() chan<- i, t| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (chan<- i, t) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (chan<- i, t) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi recieve only channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() <-chan i, t| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi recieve only channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() <-chan i, t| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (<-chan i, t) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (<-chan i, t) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
   describe("when a multi return exists with cursor at the start of the first type", function()
     local winid = 0
@@ -615,27 +666,30 @@ describe("test functions with body defined", function()
     end)
   end)
 
-  describe("when a multi inline interface return is started with cursor at the end of the comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() interface{M() []b},| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi inline interface return is started with cursor at the end of the comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() interface{M() []b},| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (interface{M() []b},) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (interface{M() []b},) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
   describe("when a multi return exists with cursor not in the return definition", function()
     local winid = 0
@@ -749,36 +803,35 @@ describe("test functions without a body defined", function()
     end)
   end)
 
-  describe("when a single return with comma has an valid preceding type definition with cursor in return definition", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({"func Foo() i {}",
-        "",
-        "func Bar() i,|"}
-      )
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single return with comma has an valid preceding type definition with cursor in return definition",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({ "func Foo() i {}", "", "func Bar() i,|" })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func Foo() i {}",
-        "",
-        "func Bar() (i,)"
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func Foo() i {}",
+          "",
+          "func Bar() (i,)",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should make sure the cursor stays in front of the comma", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
-
+      it("should make sure the cursor stays in front of the comma", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
   describe(
     "when a multi return is started with cursor at the end of the first type with a comma",
@@ -802,8 +855,8 @@ describe("test functions without a body defined", function()
         local char = utils.get_cursor_char(winid)
         eq(",", char)
       end)
-    end)
-
+    end
+  )
 
   describe("when a multi return is started with cursor at the end of the second type", function()
     local winid = 0
@@ -827,144 +880,162 @@ describe("test functions without a body defined", function()
     end)
   end)
 
-  describe("when a single interface with one space return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() interface {}|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single interface with one space return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() interface {}|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() interface {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() interface {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("}", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 
-  describe("when a single interface with one space and nested brackets return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() interface { { } }|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single interface with one space and nested brackets return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() interface { { } }|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() interface { { } }", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() interface { { } }", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("}", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 
-  describe("when a single list of interface with one space and nested brackets return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() string[ interface { } ]|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single list of interface with one space and nested brackets return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() string[ interface { } ]|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() string[ interface { } ]", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() string[ interface { } ]", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("]", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("]", char)
+      end)
+    end
+  )
 
-  describe("when a single interface with three spaces return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() interface   {}|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single interface with three spaces return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() interface   {}|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() interface   {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() interface   {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("}", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 
-  describe("when a single inline interface return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() interface{M() []b}|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single inline interface return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() interface{M() []b}|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() interface{M() []b}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() interface{M() []b}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("}", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 
-  describe("when there are multiple functions and a multi return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "func Foo() i,|",
-        "func Bar() j {}"
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when there are multiple functions and a multi return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "func Foo() i,|",
+          "func Bar() j {}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the first function return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func Foo() (i,)",
-        "func Bar() j {}"
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the first function return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func Foo() (i,)",
+          "func Bar() j {}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
   describe("when a multi return exists with cursor at the start of the first type", function()
     local winid = 0
@@ -1010,173 +1081,197 @@ describe("test functions without a body defined", function()
     end)
   end)
 
-  describe("when a multi channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() chan i, t|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() chan i, t|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (chan i, t)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (chan i, t)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi channel return with multiple channels is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() chan i, chan t|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi channel return with multiple channels is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() chan i, chan t|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (chan i, chan t)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (chan i, chan t)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi send only channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() chan<- i, t|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi send only channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() chan<- i, t|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (chan<- i, t)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (chan<- i, t)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi recieve only channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() <-chan i, t|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi recieve only channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() <-chan i, t|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (<-chan i, t)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (<-chan i, t)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi slice return is started with cursor at the end of the comma and a proceeding valid declaration", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "func foo() []string,|",
-        "func bar() {}"
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi slice return is started with cursor at the end of the comma and a proceeding valid declaration",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "func foo() []string,|",
+          "func bar() {}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type as the parse tree is completely broken at this point", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func foo() []string,",
-        "func bar() {}"
-      }
-      eq(expected, lines)
-    end)
+      it(
+        "should not add parentheses around the return type as the parse tree is completely broken at this point",
+        function()
+          local lines = utils.get_win_lines(winid)
+          local expected = {
+            "func foo() []string,",
+            "func bar() {}",
+          }
+          eq(expected, lines)
+        end
+      )
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when a multi slice return is started with cursor at the end of the second type and a proceeding valid declaration", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "func foo() []string, t|",
-        "func bar() {}"
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi slice return is started with cursor at the end of the second type and a proceeding valid declaration",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "func foo() []string, t|",
+          "func bar() {}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func foo() ([]string, t)",
-        "func bar() {}"
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func foo() ([]string, t)",
+          "func bar() {}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi inline interface return is started with cursor at the end of the comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() interface{M() []b},|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi inline interface return is started with cursor at the end of the comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() interface{M() []b},|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (interface{M() []b},)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (interface{M() []b},)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 end)
 
 describe("test methods with body defined", function()
@@ -1202,137 +1297,155 @@ describe("test methods with body defined", function()
     end)
   end)
 
-  describe("when a single channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() chan i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() chan i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() chan i {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() chan i {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single send only channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() chan<- i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single send only channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() chan<- i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() chan<- i {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() chan<- i {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single recieve only channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() <-chan i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single recieve only channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() <-chan i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() <-chan i {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() <-chan i {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single named channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() c chan i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single named channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() c chan i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (c chan i) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (c chan i) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single named send only channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() c chan<- i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single named send only channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() c chan<- i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (c chan<- i) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (c chan<- i) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
-  describe("when a single named recieve only channel return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() c <-chan i| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single named recieve only channel return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() c <-chan i| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (c <-chan i) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (c <-chan i) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("i", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("i", char)
+      end)
+    end
+  )
 
   describe("when a single return has parenthesis ", function()
     local winid = 0
@@ -1378,95 +1491,98 @@ describe("test methods with body defined", function()
     end)
   end)
 
-  describe("when a single return with comma has an invalid proceeding type definition with cursor in return definition", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({"func (b *Bar) Foo() i,| {}",
-        "",
-        "type foo"}
+  describe(
+    "when a single return with comma has an invalid proceeding type definition with cursor in return definition",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({ "func (b *Bar) Foo() i,| {}", "", "type foo" })
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it(
+        "should not add parentheses around the return type as the fix parse contains errors and we are not sure it is safe",
+        function()
+          local lines = utils.get_win_lines(winid)
+          local expected = {
+            "func (b *Bar) Foo() i, {}",
+            "",
+            "type foo",
+          }
+          eq(expected, lines)
+        end
       )
-      vim.cmd("AutoFixReturn")
-    end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      it("should make sure the cursor stays in front of the comma", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-    it("should not add parentheses around the return type as the fix parse contains errors and we are not sure it is safe", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func (b *Bar) Foo() i, {}",
-        "",
-        "type foo"
-      }
-      eq(expected, lines)
-    end)
+  describe(
+    "when a single return with comma has an invalid proceeding type definition with cursor in invalid type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({ "func (b *Bar) Foo() i, {}", "", "type f|oo" })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    it("should make sure the cursor stays in front of the comma", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-  describe("when a single return with comma has an invalid proceeding type definition with cursor in invalid type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({"func (b *Bar) Foo() i, {}",
-        "",
-        "type f|oo"}
-      )
-      vim.cmd("AutoFixReturn")
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func (b *Bar) Foo() i, {}",
+          "",
+          "type foo",
+        }
+        eq(expected, lines)
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("f", char)
+      end)
+    end
+  )
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func (b *Bar) Foo() i, {}",
-        "",
-        "type foo"
-      }
-      eq(expected, lines)
-    end)
+  describe(
+    "when a single return with comma has an invalid proceeding type definition with cursor in the function name",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({ "func (b *Bar) Fo|o() i, {}", "", "type foo" })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("f", char)
-    end)
-  end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-  describe("when a single return with comma has an invalid proceeding type definition with cursor in the function name", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({"func (b *Bar) Fo|o() i, {}",
-        "",
-        "type foo"}
-      )
-      vim.cmd("AutoFixReturn")
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func (b *Bar) Foo() i, {}",
+          "",
+          "type foo",
+        }
+        eq(expected, lines)
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
-
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func (b *Bar) Foo() i, {}",
-        "",
-        "type foo"
-      }
-      eq(expected, lines)
-    end)
-
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("o", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("o", char)
+      end)
+    end
+  )
 
   describe(
     "when a single return is started with cursor at the end of the first type with a comma",
@@ -1511,93 +1627,105 @@ describe("test methods with body defined", function()
     end)
   end)
 
-  describe("when a multi channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() chan i, t| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() chan i, t| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (chan i, t) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (chan i, t) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi channel return with multiple channels is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() chan i, chan t| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi channel return with multiple channels is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() chan i, chan t| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (chan i, chan t) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (chan i, chan t) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi send only channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() chan<- i, t| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi send only channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() chan<- i, t| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (chan<- i, t) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (chan<- i, t) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi recieve only channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() <-chan i, t| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi recieve only channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() <-chan i, t| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (<-chan i, t) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (<-chan i, t) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
   describe("when a multi return exists with cursor at the start of the first type", function()
     local winid = 0
@@ -1665,27 +1793,30 @@ describe("test methods with body defined", function()
     end)
   end)
 
-  describe("when a multi inline interface return is started with cursor at the end of the comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (s *string) Foo() interface{M() []b},| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi inline interface return is started with cursor at the end of the comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (s *string) Foo() interface{M() []b},| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (s *string) Foo() (interface{M() []b},) {}", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (s *string) Foo() (interface{M() []b},) {}", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
   describe("when a multi return exists with cursor in the body definition", function()
     local winid = 0
@@ -1777,36 +1908,35 @@ describe("test methods without a body defined", function()
     end)
   end)
 
-  describe("when a single return with comma has an valid preceeding type definition with cursor in return definition", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({"func (b *Bar) Foo() i {}",
-        "",
-        "func Bar() i,|"}
-      )
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single return with comma has an valid preceeding type definition with cursor in return definition",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({ "func (b *Bar) Foo() i {}", "", "func Bar() i,|" })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func (b *Bar) Foo() i {}",
-        "",
-        "func Bar() (i,)"
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func (b *Bar) Foo() i {}",
+          "",
+          "func Bar() (i,)",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should make sure the cursor stays in front of the comma", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
-
+      it("should make sure the cursor stays in front of the comma", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
   describe(
     "when a multi return is started with cursor at the end of the first type with a comma",
@@ -1830,8 +1960,8 @@ describe("test methods without a body defined", function()
         local char = utils.get_cursor_char(winid)
         eq(",", char)
       end)
-    end)
-
+    end
+  )
 
   describe("when a multi return is started with cursor at the end of the second type", function()
     local winid = 0
@@ -1899,173 +2029,194 @@ describe("test methods without a body defined", function()
     end)
   end)
 
-  describe("when there are multiple methods and a multi return is started with cursor at the end of the first type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "func (s *string) Foo() i,|",
-        "func (s *string) Bar() j {}"
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when there are multiple methods and a multi return is started with cursor at the end of the first type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "func (s *string) Foo() i,|",
+          "func (s *string) Bar() j {}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the first function return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func (s *string) Foo() (i,)",
-        "func (s *string) Bar() j {}"
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the first function return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func (s *string) Foo() (i,)",
+          "func (s *string) Bar() j {}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when a multi channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() chan i, t|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() chan i, t|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (chan i, t)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (chan i, t)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi slice return is started with cursor at the end of the second type and a proceeding valid declaration", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "func (s *string) foo() []string, t|",
-        "func (s *string) bar() {}"
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi slice return is started with cursor at the end of the second type and a proceeding valid declaration",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "func (s *string) foo() []string, t|",
+          "func (s *string) bar() {}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "func (s *string) foo() ([]string, t)",
-        "func (s *string) bar() {}"
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "func (s *string) foo() ([]string, t)",
+          "func (s *string) bar() {}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi channel return with multiple channels is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() chan i, chan t|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi channel return with multiple channels is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() chan i, chan t|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (chan i, chan t)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (chan i, chan t)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi send only channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() chan<- i, t|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi send only channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() chan<- i, t|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (chan<- i, t)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (chan<- i, t)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 
-  describe("when a multi inline interface return is started with cursor at the end of the comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (s *string) Foo() interface{M() []b},|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi inline interface return is started with cursor at the end of the comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (s *string) Foo() interface{M() []b},|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (s *string) Foo() (interface{M() []b},)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (s *string) Foo() (interface{M() []b},)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when a multi recieve only channel return is started with cursor at the end of the second type", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func (b *Bar) Foo() <-chan i, t|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a multi recieve only channel return is started with cursor at the end of the second type",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() <-chan i, t|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func (b *Bar) Foo() (<-chan i, t)", lines[1])
-    end)
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (<-chan i, t)", lines[1])
+      end)
 
-    it("should not touch the cursor", function()
-      local char = utils.get_cursor_char(winid)
-      eq("t", char)
-    end)
-  end)
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("t", char)
+      end)
+    end
+  )
 end)
 
 describe("test non function syntax constructs", function()
@@ -2075,13 +2226,13 @@ describe("test non function syntax constructs", function()
       winid = utils.set_test_window_value({
         "package main",
         "",
-        "import \"fmt\"",
+        'import "fmt"',
         "",
         "func main() {",
         "  for i:=0|;i<10;i++{",
-        "    fmt.Println(\"Hello\")",
+        '    fmt.Println("Hello")',
         "  }",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -2095,13 +2246,13 @@ describe("test non function syntax constructs", function()
       local expected = {
         "package main",
         "",
-        "import \"fmt\"",
+        'import "fmt"',
         "",
         "func main() {",
         "  for i:=0;i<10;i++{",
-        "    fmt.Println(\"Hello\")",
+        '    fmt.Println("Hello")',
         "  }",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
@@ -2118,13 +2269,13 @@ describe("test non function syntax constructs", function()
       winid = utils.set_test_window_value({
         "package main",
         "",
-        "import \"fmt\"",
+        'import "fmt"',
         "",
         "func main() {",
         "  for i:=0;i<1|0;i++{",
-        "    fmt.Println(\"Hello\")",
+        '    fmt.Println("Hello")',
         "  }",
-        "}"
+        "}",
       })
       vim.cmd("AutoFixReturn")
     end)
@@ -2138,13 +2289,13 @@ describe("test non function syntax constructs", function()
       local expected = {
         "package main",
         "",
-        "import \"fmt\"",
+        'import "fmt"',
         "",
         "func main() {",
         "  for i:=0;i<10;i++{",
-        "    fmt.Println(\"Hello\")",
+        '    fmt.Println("Hello")',
         "  }",
-        "}"
+        "}",
       }
       eq(expected, lines)
     end)
