@@ -45,6 +45,22 @@ function M.parse_declaration(cursor_row)
         (ERROR)? @outside_error_end
       )
 
+      ;; For functions that are created above existing valid declarations treesitter
+      ;; parses the tree with the error token outside the function declaration and no result field
+      ;; so we need to handle that here
+      ;; func Foo() i,| 
+      ;; 
+      ;; func Bar() {}
+      (
+        (function_declaration
+          name: (_)
+          parameters: (_) 
+          !result
+        ) @func
+        .
+        (ERROR)? @outside_error_end
+      )
+
       ;; The following code 
       ;;
       ;; func (b *Bar) Foo() i, 
@@ -73,6 +89,21 @@ function M.parse_declaration(cursor_row)
         .
         ;; The following definition `func (b *Bar) Foo() i,|` parses
         ;; with the final error token for the , outside of the method_declaration
+        (ERROR)? @outside_error_end
+      )
+      ;; For methods that are created above existing valid declarations treesitter
+      ;; parses the tree with the error token outside the function declaration and no result field
+      ;; so we need to handle that here
+      ;; func (s *string) Foo() i,| 
+      ;; 
+      ;; func (s *string) Bar() {}
+      (
+        (method_declaration
+          name: (_)
+          parameters: (_) 
+          !result
+        ) @func
+        .
         (ERROR)? @outside_error_end
       )
     ]
@@ -129,6 +160,9 @@ function M.parse_declaration(cursor_row)
     -- The parse tree for `func Foo() int,|` contains the ERROR object OUTSIDE the function_declaration
     -- which contains the final trailing comma so we match this here to extend our match to include the typed comma
     elseif capture_name == "error_end" or capture_name == "outside_error_start" or capture_name == "outside_error_end" then
+      if final_start_col == 0 then
+        final_start_col = start_col
+      end
       final_end_col = end_col
     end
 

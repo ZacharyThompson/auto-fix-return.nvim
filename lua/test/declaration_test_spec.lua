@@ -337,6 +337,35 @@ describe("test functions with body defined", function()
     end)
   end)
 
+  describe("when there are multiple functions and a multi return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "func Foo() i,| {}",
+        "func Bar() j {}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the first function return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "func Foo() (i,) {}",
+        "func Bar() j {}"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
   describe("when a multi channel return is started with cursor at the end of the second type", function()
     local winid = 0
     before_each(function()
@@ -659,6 +688,35 @@ describe("test functions without a body defined", function()
     end)
   end)
 
+  describe("when there are multiple functions and a multi return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "func Foo() i,|",
+        "func Bar() j {}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the first function return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "func Foo() (i,)",
+        "func Bar() j {}"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
   describe("when a multi return exists with cursor at the start of the first type", function()
     local winid = 0
     before_each(function()
@@ -792,7 +850,7 @@ describe("test functions without a body defined", function()
   end)
 end)
 
-describe("test functions with body defined", function()
+describe("test methods with body defined", function()
   describe("when a single return is started with cursor at the end of the first type", function()
     local winid = 0
     before_each(function()
@@ -1301,7 +1359,7 @@ describe("test functions with body defined", function()
   end)
 end)
 
-describe("test functions without a body defined", function()
+describe("test methods without a body defined", function()
   describe("when a single return is started with cursor at the end of the first type", function()
     local winid = 0
     before_each(function()
@@ -1487,6 +1545,35 @@ describe("test functions without a body defined", function()
     it("not touch the cursor", function()
       local char = utils.get_cursor_char(winid)
       eq("F", char)
+    end)
+  end)
+
+  describe("when there are multiple methods and a multi return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "func (s *string) Foo() i,|",
+        "func (s *string) Bar() j {}"
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the first function return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "func (s *string) Foo() (i,)",
+        "func (s *string) Bar() j {}"
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
     end)
   end)
 
