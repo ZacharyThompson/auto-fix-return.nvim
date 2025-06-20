@@ -36,7 +36,7 @@ function M.parse_function()
           (ERROR)? @error_end
           body: (_)? @body
         ) @func
-        
+        .
         ;; The following definition `func Foo() i,|` parses
         ;; with the final error token for the , outside of the function_declaration
         (ERROR)? @outside_error_end
