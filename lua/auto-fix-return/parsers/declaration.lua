@@ -6,7 +6,7 @@ local M = {}
 ---@field end_row number
 ---@field end_col number
 
--- Parse function declarations and return the definition grid if applicable
+-- Parse function and method declarations and return the definition grid if applicable
 ---@param cursor_row number The cursor row (1-indexed as from nvim_win_get_cursor)
 ---@return TextGrid?
 function M.parse_declaration(cursor_row)

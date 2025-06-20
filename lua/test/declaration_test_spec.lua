@@ -50,6 +50,50 @@ describe("test functions with body defined", function()
     end)
   end)
 
+  describe("when a single interface with one space return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() interface {}| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() interface {} {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("}", char)
+    end)
+  end)
+
+  describe("when a single interface with three spaces return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() interface   {}| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() interface   {} {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("}", char)
+    end)
+  end)
+
   describe("when a single send only channel return is started with cursor at the end of the first type", function()
     local winid = 0
     before_each(function()
@@ -498,6 +542,28 @@ describe("test functions with body defined", function()
     end)
   end)
 
+  describe("when a multi inline interface return is started with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() interface{M() []b},| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (interface{M() []b},) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
   describe("when a multi return exists with cursor not in the return definition", function()
     local winid = 0
     before_each(function()
@@ -688,6 +754,116 @@ describe("test functions without a body defined", function()
     end)
   end)
 
+  describe("when a single interface with one space return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() interface {}|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() interface {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("}", char)
+    end)
+  end)
+
+  describe("when a single interface with one space and nested brackets return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() interface { { } }|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() interface { { } }", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("}", char)
+    end)
+  end)
+
+  describe("when a single list of interface with one space and nested brackets return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() string[ interface { } ]|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() string[ interface { } ]", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("]", char)
+    end)
+  end)
+
+  describe("when a single interface with three spaces return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() interface   {}|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() interface   {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("}", char)
+    end)
+  end)
+
+  describe("when a single inline interface return is started with cursor at the end of the first type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() interface{M() []b}|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() interface{M() []b}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("}", char)
+    end)
+  end)
+
   describe("when there are multiple functions and a multi return is started with cursor at the end of the first type", function()
     local winid = 0
     before_each(function()
@@ -846,6 +1022,28 @@ describe("test functions without a body defined", function()
     it("should not touch the cursor", function()
       local char = utils.get_cursor_char(winid)
       eq("t", char)
+    end)
+  end)
+
+  describe("when a multi inline interface return is started with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() interface{M() []b},|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (interface{M() []b},)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
     end)
   end)
 end)
@@ -1336,6 +1534,28 @@ describe("test methods with body defined", function()
     end)
   end)
 
+  describe("when a multi inline interface return is started with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (s *string) Foo() interface{M() []b},| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (s *string) Foo() (interface{M() []b},) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
   describe("when a multi return exists with cursor in the body definition", function()
     local winid = 0
     before_each(function()
@@ -1640,6 +1860,28 @@ describe("test methods without a body defined", function()
     it("should not touch the cursor", function()
       local char = utils.get_cursor_char(winid)
       eq("t", char)
+    end)
+  end)
+
+  describe("when a multi inline interface return is started with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (s *string) Foo() interface{M() []b},|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (s *string) Foo() (interface{M() []b},)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
     end)
   end)
 

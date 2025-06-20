@@ -61,15 +61,8 @@ function M.validate_fix(curr_bufnr, parse_fix)
   )
 
   -- Test if there are any ERROR tokens in the parse tree, we should not generate invalid parses
-  local error_query = "(ERROR)"
-  local query = vim.treesitter.query.parse("go", error_query)
   local tree = vim.treesitter.get_parser(new_bufnr):parse(false)[1]
-  local error_found = false
-
-  for _ in query:iter_matches(tree:root(), 0) do
-    error_found = true
-    break
-  end
+  local error_found = tree:root():has_error()
 
   vim.api.nvim_buf_delete(new_bufnr, {force = true})
 
@@ -86,8 +79,8 @@ end
 ---@return FixedDefinition
 function M.build_fixed_definition(line, cursor_col)
   -- Strip the parens off, we will add them back if we need to
-  local value = string.gsub(line, "%(", "")
-  value = string.gsub(value, "%)", "")
+  local value = string.gsub(line, "^%(", "")
+  value = string.gsub(value, "%)$", "")
   -- If there are any commas in the return definition we know we will need parenthesis
   local returns = vim.split(value, ",")
 
@@ -105,15 +98,47 @@ function M.build_fixed_definition(line, cursor_col)
 
     local temp_returns = {}
     local curr_word = ""
+    local bracket_stack = {}
 
     -- We iterate over the string and split it on spaces to build up a possible named return
-    -- but `chan` syntax is unique in that a single return that is a channel type DOES NOT
+    --
+    -- NOTE: `chan` syntax is unique in that a single return that is a channel type DOES NOT
     -- require parenthesis, this is for all forms of channel including `chan` `<-chan` and `chan<-`
-    for c in trimmed:gmatch(".") do
+    for i = 1, #trimmed do
+      local c = trimmed:sub(i, i)
+
+      if c == "{" or c == "[" then
+        table.insert(bracket_stack, #bracket_stack+1, c)
+      end
+      if c == "}" or c == "]" then
+        table.remove(bracket_stack, #bracket_stack)
+      end
+
       -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
       if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil) then
-        temp_returns[#temp_returns + 1] = curr_word
-        curr_word = ""
+
+        -- Peek ahead to find the next non-space character
+        -- so that we can ignore whitespace in return definitions like `interface   {}` 
+        -- we then do a stack approach to ensure we only add a return definition if we have validated 
+        -- that we have gotten to the end of all bracket pairs E.G `string[ interface { } ]`
+        local next_char = nil
+        for j = i + 1, #trimmed do
+          local peek = trimmed:sub(j, j)
+          if peek ~= " " then
+            next_char = peek
+            break
+          end
+        end
+
+        if next_char == "{" or next_char == "[" then
+          table.insert(bracket_stack, #bracket_stack+1, next_char)
+        end
+
+        -- vim.print(next_char, bracket_stack)
+        if #bracket_stack == 0 then
+          temp_returns[#temp_returns + 1] = curr_word
+          curr_word = ""
+        end
       end
 
       curr_word = curr_word .. c
