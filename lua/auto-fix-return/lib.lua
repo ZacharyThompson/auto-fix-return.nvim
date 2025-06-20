@@ -76,6 +76,76 @@ function M.validate_fix(curr_bufnr, parse_fix)
   return not error_found
 end
 
+---@class FixedDefinition
+---@field new_line string
+---@field final_cursor_col number
+
+---Build the fixed return definition with proper parenthesis handling
+---@param line string The original line text
+---@param cursor_col number The current cursor column
+---@return FixedDefinition
+function M.build_fixed_definition(line, cursor_col)
+  -- Strip the parens off, we will add them back if we need to
+  local value = string.gsub(line, "%(", "")
+  value = string.gsub(value, "%)", "")
+  -- If there are any commas in the return definition we know we will need parenthesis
+  local returns = vim.split(value, ",")
+
+  local function trim_end(s)
+    return s:gsub("%s+$", "")
+  end
+
+  -- If we do not have any commas we might still be doing a named return
+  -- `E.G func foo() err e` <- once the e is typed we know a named return has been
+  -- initiated and we should lex it again,
+  -- however, we need to trim the leading space so we dont surround the return after you have hit space with
+  -- JUST a type return
+  if #returns == 1 then
+    local trimmed = trim_end(value)
+
+    local temp_returns = {}
+    local curr_word = ""
+
+    -- We iterate over the string and split it on spaces to build up a possible named return
+    -- but `chan` syntax is unique in that a single return that is a channel type DOES NOT
+    -- require parenthesis, this is for all forms of channel including `chan` `<-chan` and `chan<-`
+    for c in trimmed:gmatch(".") do
+      -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
+      if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil) then
+        temp_returns[#temp_returns + 1] = curr_word
+        curr_word = ""
+      end
+
+      curr_word = curr_word .. c
+    end
+
+    if curr_word ~= "" then
+        temp_returns[#temp_returns + 1] = curr_word
+    end
+
+    returns = temp_returns
+  end
+
+  local new_line = line
+  local final_cursor_col = cursor_col
+
+  -- If returns just equals one we know we have a single return and do
+  -- not need parenthesis
+  -- Here we also need to set the offset for the CURSOR to be placed after we do the text replacement
+  if #returns == 1 then
+    final_cursor_col = final_cursor_col - 1
+    new_line = value
+  else
+    final_cursor_col = final_cursor_col + 1
+    new_line = "(" .. value .. ")"
+  end
+
+  return {
+    new_line = new_line,
+    final_cursor_col = final_cursor_col,
+  }
+end
+
 ---@class ParseFixValues
 ---@field grid TextGrid
 ---@field text_value string
@@ -184,67 +254,10 @@ function M.parse_return()
 
   -- Here we rebuild the entire return statement to a syntactically correct version
   -- splitting on commas to decide if there is a parameter list or a single value
-  -- Strip the parens off, we will add them back if we need to
-  local value = string.gsub(line, "%(", "")
-  value = string.gsub(value, "%)", "")
-
-  -- We will need to move the cursor depending on the action that we take,
-  -- grab the current cusor position so we can adjust it below
-  local final_cursor_col = cursor_col
-
-  -- If there are any commas in the return definition we know we will need parenthesis
-  local returns = vim.split(value, ",")
-
-  local function trim_end(s)
-    return s:gsub("%s+$", "")
-  end
-
-  -- If we do not have any commas we might still be doing a named return
-  -- `E.G func foo() err e` <- once the e is typed we know a named return has been
-  -- initiated and we should lex it again,
-  -- however, we need to trim the leading space so we dont surround the return after you have hit space with
-  -- JUST a type return
-  if #returns == 1 then
-    local trimmed = trim_end(value)
-
-    local temp_returns = {}
-    local curr_word = ""
-
-    -- We iterate over the string and split it on spaces to build up a possible named return
-    -- but `chan` syntax is unique in that a single return that is a channel type DOES NOT
-    -- require parenthesis, this is for all forms of channel including `chan` `<-chan` and `chan<-`
-    for c in trimmed:gmatch(".") do
-      -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
-      if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil) then
-        temp_returns[#temp_returns + 1] = curr_word
-        curr_word = ""
-      end
-
-      curr_word = curr_word .. c
-    end
-
-    if curr_word ~= "" then
-        temp_returns[#temp_returns + 1] = curr_word
-    end
-
-    returns = temp_returns
-  end
-
-  local new_line = line
-
-  -- If returns just equals one we know we have a single return and do
-  -- not need parenthesis
-  -- Here we also need to set the offset for the CURSOR to be placed after we do the text replacement
-  if #returns == 1 then
-    final_cursor_col = final_cursor_col - 1
-    new_line = value
-  else
-    final_cursor_col = final_cursor_col + 1
-    new_line = "(" .. value .. ")"
-  end
+  local fixed_def = M.build_fixed_definition(line, cursor_col)
 
   -- If the line has not changed or theres nothing to add then we just bail out here
-  if line == new_line then
+  if line == fixed_def.new_line then
     return
   end
 
@@ -264,8 +277,8 @@ function M.parse_return()
 
   return {
     grid=return_def_coords,
-    text_value = new_line,
-    final_cursor_column = final_cursor_col,
+    text_value = fixed_def.new_line,
+    final_cursor_column = fixed_def.final_cursor_col,
   }
 end
 
