@@ -160,6 +160,8 @@ function M.parse_declaration(cursor_row)
     -- The parse tree for `func Foo() int,|` contains the ERROR object OUTSIDE the function_declaration
     -- which contains the final trailing comma so we match this here to extend our match to include the typed comma
     elseif capture_name == "error_end" or capture_name == "outside_error_start" or capture_name == "outside_error_end" then
+
+      -- Rarely the outside error will also include the starting range, see the ts query for the case where this happens
       if final_start_col == 0 then
         final_start_col = start_col
       end
