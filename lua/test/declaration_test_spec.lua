@@ -138,7 +138,7 @@ describe("test functions with body defined", function()
     end)
   end)
 
-  describe("when a single recieve only channel return is started with cursor at the end of the first type", function()
+  describe("when a single receive only channel return is started with cursor at the end of the first type", function()
     local winid = 0
     before_each(function()
       winid = utils.set_test_window_value("func Foo() <-chan i| {}")
@@ -749,7 +749,7 @@ describe("test functions without a body defined", function()
     end)
   end)
 
-  describe("when a single return with comma has an valid preceeding type definition with cursor in return definition", function()
+  describe("when a single return with comma has an valid preceding type definition with cursor in return definition", function()
     local winid = 0
     before_each(function()
       winid = utils.set_test_window_value({"func Foo() i {}",

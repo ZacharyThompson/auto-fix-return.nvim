@@ -93,6 +93,9 @@ function M.build_fixed_definition(line, cursor_col)
   -- initiated and we should lex it again,
   -- however, we need to trim the leading space so we dont surround the return after you have hit space with
   -- JUST a type return
+  -- 
+  -- This section is essentially a small parser for go type decls as a declaration 
+  -- can have arbitrary amount of spaces which can masquarede as a named return 
   if #returns == 1 then
     local trimmed = trim_end(value)
 
