@@ -54,6 +54,7 @@ install-ts-parser:
     # Generate and compile the parser
     tree-sitter generate
     tree-sitter build --output "../parser/go.so"
+    cd ../..
 
     # Create parser info file
     echo "\"$PARSER_REV\"" > "$PARSER_INFO_DIR/go.revision"
