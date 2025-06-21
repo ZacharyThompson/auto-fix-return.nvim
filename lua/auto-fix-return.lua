@@ -20,7 +20,7 @@ M.setup = function(config)
   local final_config = vim.tbl_deep_extend("force", default_config, config)
 
   if final_config.enable_autocmds then
-    lib.enable_autocmds()
+    lib.enable_tree_cbs()
   end
 
   lib.setup_user_commands()

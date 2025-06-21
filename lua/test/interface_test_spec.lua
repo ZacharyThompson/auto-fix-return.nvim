@@ -289,106 +289,115 @@ describe("test interface method declarations", function()
     end)
   end)
 
-  describe("when interface method has a multi return with an empty interface and the cursor on the comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "type Foo interface {",
-        "  Bar() interface{},|",
-        "}",
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when interface method has a multi return with an empty interface and the cursor on the comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bar() interface{},|",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the named return types", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "type Foo interface {",
-        "  Bar() (interface{},)",
-        "}",
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the named return types", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "type Foo interface {",
+          "  Bar() (interface{},)",
+          "}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should keep cursor at end of type", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should keep cursor at end of type", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when interface with multiple methods has a multi return with an empty interface and the cursor on the comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "type Foo interface {",
-        "  Bax() int",
-        "  Bar() interface{},|",
-        "  Baz() string",
-        "}",
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when interface with multiple methods has a multi return with an empty interface and the cursor on the comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bax() int",
+          "  Bar() interface{},|",
+          "  Baz() string",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the named return types", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "type Foo interface {",
-        "  Bax() int",
-        "  Bar() (interface{},)",
-        "  Baz() string",
-        "}",
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the named return types", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "type Foo interface {",
+          "  Bax() int",
+          "  Bar() (interface{},)",
+          "  Baz() string",
+          "}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should keep cursor at end of type", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should keep cursor at end of type", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when interface with multiple methods has a multi return with parentheses around an empty interface", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "type Foo interface {",
-        "  Bax() int",
-        "  Bar() (interface{}|)",
-        "  Baz() string",
-        "}",
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when interface with multiple methods has a multi return with parentheses around an empty interface",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bax() int",
+          "  Bar() (interface{}|)",
+          "  Baz() string",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the named return types", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "type Foo interface {",
-        "  Bax() int",
-        "  Bar() interface{}",
-        "  Baz() string",
-        "}",
-      }
-      eq(expected, lines)
-    end)
+      it("should add parentheses around the named return types", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "type Foo interface {",
+          "  Bax() int",
+          "  Bar() interface{}",
+          "  Baz() string",
+          "}",
+        }
+        eq(expected, lines)
+      end)
 
-    it("should keep cursor at end of type", function()
-      local char = utils.get_cursor_char(winid)
-      eq("}", char)
-    end)
-  end)
+      it("should keep cursor at end of type", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 
   describe("when interface method has complex return types", function()
     local winid = 0
@@ -762,38 +771,44 @@ describe("test interface method declarations", function()
     end)
   end)
 
-  describe("when multiple interface methods exist with channels with the middle being named and multi return", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value({
-        "type Foo interface {",
-        "  Bar() chan int",
-        "  Baz() c chan<- string,|",
-        "  Bax() <-chan error",
-        "}",
-      })
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when multiple interface methods exist with channels with the middle being named and multi return",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bar() chan int",
+          "  Baz() c chan<- string,|",
+          "  Bax() <-chan error",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should not modify anything as the parse tree is completely broken at this point", function()
-      local lines = utils.get_win_lines(winid)
-      local expected = {
-        "type Foo interface {",
-        "  Bar() chan int",
-        "  Baz() c chan<- string,",
-        "  Bax() <-chan error",
-        "}",
-      }
-      eq(expected, lines)
-    end)
+      it(
+        "should not modify anything as the parse tree is completely broken at this point",
+        function()
+          local lines = utils.get_win_lines(winid)
+          local expected = {
+            "type Foo interface {",
+            "  Bar() chan int",
+            "  Baz() c chan<- string,",
+            "  Bax() <-chan error",
+            "}",
+          }
+          eq(expected, lines)
+        end
+      )
 
-    it("should set the cursor to inside the parens", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 end)
