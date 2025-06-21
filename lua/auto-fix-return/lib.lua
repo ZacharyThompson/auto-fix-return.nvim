@@ -23,13 +23,6 @@ M.setup_user_commands = function()
 end
 
 M.enable_tree_cbs = function()
-  if command_id ~= 0 then
-    vim.notify("AutoFixReturn: handlers already enabled", vim.log.levels.INFO)
-    return
-  end
-
-  command_id = vim.api.nvim_create_autocmd({ "BufReadPost" }, { callback = M.register_buf_handler })
-
   for bufnr, _ in pairs(registered_ts_cbs_bufs) do
     registered_ts_cbs_bufs[bufnr] = true
   end
@@ -45,6 +38,13 @@ M.enable_tree_cbs = function()
   end
 
   vim.notify("AutoFixReturn: Enabled on buffers", vim.log.levels.INFO)
+
+  if command_id ~= 0 then
+    return
+  end
+
+  -- Register the autocmd to handle buffer read events that attach ts callbacks to the buffers parser
+  command_id = vim.api.nvim_create_autocmd({ "BufReadPost" }, { callback = M.register_buf_handler })
 end
 
 function M.register_buf_handler(event)
@@ -94,7 +94,6 @@ end
 
 function M.disable_ts_cbs()
   if command_id == 0 then
-    vim.notify("AutoFixReturn: already disabled", vim.log.levels.INFO)
     return
   end
 
