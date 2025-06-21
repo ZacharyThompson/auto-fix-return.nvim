@@ -197,7 +197,7 @@ describe("test interface method declarations", function()
     before_each(function()
       winid = utils.set_test_window_value({
         "type Foo interface {",
-        "  Bar() int, err",
+        "  Bar() (int, err)",
         "  Baz() i,|",
         "  Bax() error",
         "}",
@@ -213,7 +213,7 @@ describe("test interface method declarations", function()
       local lines = utils.get_win_lines(winid)
       local expected = {
         "type Foo interface {",
-        "  Bar() int, err",
+        "  Bar() (int, err)",
         "  Baz() (i,)",
         "  Bax() error",
         "}",
@@ -286,6 +286,37 @@ describe("test interface method declarations", function()
     it("should keep cursor at end of type", function()
       local char = utils.get_cursor_char(winid)
       eq("r", char)
+    end)
+  end)
+  
+  describe("when interface method has a multi return with an empty interface and the cursor on the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "type Foo interface {",
+        "  Bar() interface{},|",
+        "}",
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the named return types", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "type Foo interface {",
+        "  Bar() (interface{},)",
+        "}",
+      }
+      eq(expected, lines)
+    end)
+
+    it("should keep cursor at end of type", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
     end)
   end)
 

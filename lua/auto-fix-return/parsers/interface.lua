@@ -21,6 +21,15 @@ function M.parse_interface(cursor_row)
         .
         (ERROR)? @error_end
       )
+      (
+        (method_elem
+          name: (_)
+          parameters: (_)
+          !result
+        ) @elem
+        .
+        (ERROR)? @outside_error_end
+      )
 	]
   ]]
 )
@@ -61,10 +70,17 @@ function M.parse_interface(cursor_row)
       end
     elseif capture_name == "error_end" then
       final_end_col = end_col
+    elseif capture_name == "outside_error_end" then
+      -- Rarely the outside error will also include the starting range, see the ts query for the case where this happens
+      if final_start_col == 0 then
+        final_start_col = start_col
+      end
+      final_end_col = end_col
     end
 
     ::continue::
   end
+
   return {
     start_row = cursor_row,
     end_row = cursor_row,

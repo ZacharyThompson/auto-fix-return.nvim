@@ -67,6 +67,8 @@ function M.validate_fix(curr_bufnr, parse_fix)
   )
 
   -- Test if there are any ERROR tokens in the parse tree, we should not generate invalid parses
+  -- TODO: We should check if the invalid parse is actually related to
+  -- the return fix cursor range instead of the entire buffer
   local tree = vim.treesitter.get_parser(new_bufnr):parse(false)[1]
   local error_found = tree:root():has_error()
 
@@ -143,7 +145,6 @@ function M.build_fixed_definition(line, cursor_col)
           table.insert(bracket_stack, #bracket_stack + 1, next_char)
         end
 
-        -- vim.print(next_char, bracket_stack)
         if #bracket_stack == 0 then
           temp_returns[#temp_returns + 1] = curr_word
           curr_word = ""
@@ -212,9 +213,11 @@ function M.parse_return()
     return
   end
 
+
   -- Here we rebuild the entire return statement to a syntactically correct version
   -- splitting on commas to decide if there is a parameter list or a single value
   local fixed_def = M.build_fixed_definition(line, cursor_col)
+
 
   -- If the line has not changed or theres nothing to add then we just bail out here
   if line == fixed_def.new_line then
