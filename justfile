@@ -14,6 +14,7 @@ install-plenary:
 
 install-ts-parser:
     #!/bin/bash
+    set -euxo pipefail
     echo "===== Setting up Go TreeSitter Parser ====="
 
     PARSER_REV="5e73f476efafe5c768eda19bbe877f188ded6144"
