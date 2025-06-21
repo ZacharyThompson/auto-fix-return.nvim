@@ -55,6 +55,7 @@ Using an untested parser version may or may not work in all scenarios. The plugi
 ```lua
 return {
   "Jay-Madden/auto-fix-return.nvim",
+  event = "VeryLazy",
 
   -- nvim-treesitter is optional, the plugin will work fine without it as long as 
   -- you have a valid Go parser in $rtp/parsers.
