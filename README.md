@@ -92,7 +92,7 @@ require("auto-fix-return").setup({
 
 `AutoFixReturn disable`: Disable the autofix on type behavior
 
-### Contributing
+## Contributing
 
 Due to the nature of the plugins attempt to work with invalid parse trees a robust integration suite provides regression testing to ensure changes do not cascade issues.
 
