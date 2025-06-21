@@ -13,10 +13,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Neovim and Just
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y neovim just
+    - name: Install Neovim
+      uses: rhymond/setup-neovim@v1
+      with:
+        neovim-version: v0.11.0
+
+    - name: Install Just
+      uses: extractions/setup-just@v2
 
     - name: Install Node
       uses: actions/setup-node@v4
