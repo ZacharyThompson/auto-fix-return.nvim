@@ -11,6 +11,24 @@ function M.parse_interface(cursor_row)
 
   local query = vim.treesitter.query.parse("go", [[
     [
+      ;; For the following interface
+      ;; 
+      ;; type baz interface {
+      ;; 	Bax() int
+      ;; 	Baz() interface{},|
+      ;; 	Bax() int
+      ;; }
+      ;;
+      ;; The node containg the END of the definition is
+      ;; actually positioned as the ERROR parent node of the method_elem node
+      ;; so we need to handle that edgecase here
+      (ERROR
+        (method_elem
+          name: (_)
+          parameters: (_)
+          result: (_) @result
+        ) @elem
+      ) @outside_error_above
       (
         (method_elem
           name: (_)
@@ -50,8 +68,6 @@ function M.parse_interface(cursor_row)
     local capture_name = query.captures[id]
     local start_row, start_col, end_row, end_col = node:range()
 
-    -- We only care about captures that are on the same row as the cursor
-    -- as multiline returns are tricky to parse correctly
     if cursor_row ~= start_row or cursor_row ~= end_row then
       goto continue
     end
@@ -79,6 +95,12 @@ function M.parse_interface(cursor_row)
     end
 
     ::continue::
+
+    -- The outside_error_above token stretches across multiple rows so
+    -- we need to check it every time even if the continue check above fires
+    if capture_name == "outside_error_above" then
+      final_end_col = end_col
+    end
   end
 
   return {
