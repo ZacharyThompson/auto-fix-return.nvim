@@ -6,17 +6,15 @@ local M = {}
 local command_id = 0
 
 M.setup_user_commands = function()
-  vim.api.nvim_create_user_command("AutoFixReturn", function()
-    M.wrap_golang_return()
-  end, {})
-
-  vim.api.nvim_create_user_command("AutoFixReturnEnable", function()
-    M.enable_autocmds()
-  end, {})
-
-  vim.api.nvim_create_user_command("AutoFixReturnDisable", function()
-    M.disable_autocomds()
-  end, {})
+  vim.api.nvim_create_user_command("AutoFixReturn", function(args)
+    if #args == 0 then
+      M.wrap_golang_return()
+    elseif args[1] == "enable" then
+      M.enable_autocmds()
+    elseif args[1] == "disable" then
+      M.disable_autocomds()
+    end
+  end, {nargs=1, complete=function() return {"enable", "disable"} end})
 end
 
 M.enable_autocmds = function()

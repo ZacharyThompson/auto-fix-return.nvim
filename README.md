@@ -51,6 +51,6 @@ require("auto-fix-return").setup({
 
 `AutoFixReturn`: Format the function definition under the cursor, adding or removing parenthesis as needed
 
-`AutoFixReturnEnable`: Enable the autofix on type autocommands
+`AutoFixReturn enable`: Enable the autofix on type autocommands
 
-`AutoFixReturnDisable`: Disable the autofix on type autocommands
+`AutoFixReturn disable`: Disable the autofix on type autocommands
