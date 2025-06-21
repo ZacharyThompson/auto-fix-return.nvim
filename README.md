@@ -2,31 +2,31 @@
 
 [![Test](https://github.com/Jay-Madden/auto-fix-return.nvim/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Jay-Madden/auto-fix-return.nvim/actions/workflows/run-tests.yml)
 
-Adds or removes parenthesis from Golang return defintions as you type. 
+Adds or removes parenthesis from Golang return defintions as you type.
 
-Supports 
+Supports
 - Functions
 - Methods
 - Interfaces
-- Single returns 
-- Multi returns 
-- Named returns 
+- Single returns
+- Multi returns
+- Named returns
 - Channel returns
 
-Coming soon: 
+Coming soon:
 - Closures
 
-and hopefully all combinations of the above. If you find a bug please report it as an issue. 
+and hopefully all combinations of the above. If you find a bug please report it as an issue.
 
 ## Preview
 ![high_res_final](https://github.com/user-attachments/assets/a5b9b50d-cbc7-42a6-b3f7-e20795c93823)
 
 > [!IMPORTANT]
 > The plugin attempts to add parenthesis as you type. Which means that its mostly working off of invalid parse trees.
-> This is very nice to use but makes it very difficult to cover all edgecases from a parsing standpoint, as different error states of the tree can be matched incorectly. 
-> If you find an error state that is not covered please report it as an issue. 
-> 
-> You can run the command `AutoFixReturn disable` to turn off the autocommnd and make whatever changes you need to that line. 
+> This is very nice to use but makes it very difficult to cover all edgecases from a parsing standpoint, as different error states of the tree can be matched incorectly.
+> If you find an error state that is not covered please report it as an issue.
+>
+> You can run the command `AutoFixReturn disable` to turn off the autocommnd and make whatever changes you need to that line.
 > Then reenable the plugin with `AutoFixReturn enable` and the line will not be edited unless you touch the declarations return definition again.
 
 > [!TIP]
@@ -46,11 +46,11 @@ Due to attempting to use in progress or invalid parse trees this plugin is very 
 > :lua vim.print(io.open(require("nvim-treesitter.configs").get_parser_info_dir() .. "/go.revision"):read("*a"))
 > ```
 
-Using an untested parser version may or may not work in all scenarios. The plugin will not write the fix back to the buffer in the case the fix will generate an invalid parse tree. So an untested parser version will refuse to make fixes in some circumstances. 
+Using an untested parser version may or may not work in all scenarios. The plugin will not write the fix back to the buffer in the case the fix will generate an invalid parse tree. So an untested parser version will refuse to make fixes in some circumstances.
 
 ## Installation
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Requires the Go treesitter parser to be installed.
 > You can run `TSInstall go` if using nvim-treesitter.
 
@@ -60,9 +60,9 @@ return {
   "Jay-Madden/auto-fix-return.nvim",
   event = "VeryLazy",
 
-  -- nvim-treesitter is optional, the plugin will work fine without it as long as 
+  -- nvim-treesitter is optional, the plugin will work fine without it as long as
   -- you have a valid Go parser in $rtp/parsers.
-  -- However due to the Go grammar not being on Treesitter ABI 15 without 'nvim-treesitter' 
+  -- However due to the Go grammar not being on Treesitter ABI 15 without 'nvim-treesitter'
   -- we are unable to detect and warn if an invalid parser version is being used.
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
@@ -80,7 +80,7 @@ return {
 ```lua
 require("auto-fix-return").setup({
   -- Enable or disable the autofix on type behvaior
-  enabled = true, 
+  enabled = true,
 })
 ```
 
@@ -91,3 +91,20 @@ require("auto-fix-return").setup({
 `AutoFixReturn enable`: Enable the autofix on type behavior
 
 `AutoFixReturn disable`: Disable the autofix on type behavior
+
+### Contributing
+
+Due to the nature of the plugins attempt to work with invalid parse trees a robust integration suite provides regression testing to ensure changes do not cascade issues.
+
+The integration tests require `just` and `tree-sitter-cli` installed.
+
+- [just](https://just.systems/man/en/pre-built-binaries.html)
+- [tree-sitter-cli](https://tree-sitter.github.io/tree-sitter/creating-parsers/1-getting-started.html)
+
+The command
+
+```
+just test
+```
+
+Will clone and build the currently supported version of the Go treesitter parser and use that for the tests.
