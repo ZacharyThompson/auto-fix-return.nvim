@@ -77,19 +77,22 @@ function M.build_fixed_definition(line, cursor_col)
     --
     -- NOTE: `chan` syntax is unique in that a single return that is a channel type DOES NOT
     -- require parenthesis, this is for all forms of channel including `chan` `<-chan` and `chan<-`
+    -- NOTE: `func()` syntax is also unique in that it can contain arbitrary amounts of spaces that
+    -- should not be considered a named return
     -- TODO: This should be rewritten into a more robust parser
     for i = 1, #trimmed do
       local c = trimmed:sub(i, i)
 
-      if c == "{" or c == "[" then
+      if c == "{" or c == "[" or c == "(" then
         table.insert(bracket_stack, #bracket_stack + 1, c)
       end
-      if c == "}" or c == "]" then
+      if c == "}" or c == "]" or c == ")" then
         table.remove(bracket_stack, #bracket_stack)
       end
 
       -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
-      if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil) then
+      if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil or curr_word:find("^func")) then
+        -- vim.print(curr_word)
         -- Peek ahead to find the next non-space character
         -- so that we can ignore whitespace in return definitions like `interface   {}`
         -- we then do a stack approach to ensure we only add a return definition if we have validated
@@ -103,7 +106,7 @@ function M.build_fixed_definition(line, cursor_col)
           end
         end
 
-        if next_char == "{" or next_char == "[" then
+        if next_char == "{" or next_char == "[" or next_char == "(" then
           table.insert(bracket_stack, #bracket_stack + 1, next_char)
         end
 

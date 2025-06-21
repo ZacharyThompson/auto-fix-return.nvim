@@ -277,6 +277,183 @@ describe("test functions with body defined", function()
     end)
   end)
 
+  describe("when a single closure return with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func() i| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() func() i {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("i", char)
+    end)
+  end)
+
+  describe("when a multi closure return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func() i,| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (func() i,) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi closure return with cursor at the end of the second type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func() i, func() k| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (func() i, func() k) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("k", char)
+    end)
+  end)
+
+  describe("when a single closure with arguments return with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(int) string| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() func(int) string {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("g", char)
+    end)
+  end)
+
+  describe("when a multi closure with arguments return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(int,| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() func(int, {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+
+  describe("when a multi closure with arguments return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(int, string) error,| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (func(int, string) error,) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi closure with arguments return with cursor at the end of the second type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(context.Context) error, func(int) bool| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (func(context.Context) error, func(int) bool) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("l", char)
+    end)
+  end)
+
+  describe("when a closure with multiple returns with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(int) (string, error)| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() func(int) (string, error) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(")", char)
+    end)
+  end)
+
   describe("when a single return has no name and a valid return definition", function()
     local winid = 0
     before_each(function()
@@ -802,6 +979,160 @@ describe("test functions without a body defined", function()
     it("should keep the cursor on the i", function()
       local char = utils.get_cursor_char(winid)
       eq(" ", char)
+    end)
+  end)
+
+  describe("when a single closure return with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func() i|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() func() i", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("i", char)
+    end)
+  end)
+
+  describe("when a multi closure return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func() i,|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (func() i,)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi closure return with cursor at the end of the second type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func() i, func() k|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (func() i, func() k)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("k", char)
+    end)
+  end)
+
+  describe("when a single closure with arguments return with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(int) string|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() func(int) string", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("g", char)
+    end)
+  end)
+
+  describe("when a multi closure with arguments return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(int, string) error,|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (func(int, string) error,)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi closure with arguments return with cursor at the end of the second type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(context.Context) error, func(int) bool|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() (func(context.Context) error, func(int) bool)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("l", char)
+    end)
+  end)
+
+  describe("when a closure with multiple returns with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func Foo() func(int) (string, error)|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func Foo() func(int) (string, error)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(")", char)
     end)
   end)
 
@@ -1493,6 +1824,160 @@ describe("test methods with body defined", function()
     end)
   end)
 
+  describe("when a single closure return with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func() i| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() func() i {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("i", char)
+    end)
+  end)
+
+  describe("when a multi closure return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func() i,| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() (func() i,) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi closure return with cursor at the end of the second type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func() i, func() k| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() (func() i, func() k) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("k", char)
+    end)
+  end)
+
+  describe("when a single closure with arguments return with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func(int) string| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() func(int) string {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("g", char)
+    end)
+  end)
+
+  describe("when a multi closure with arguments return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func(int, string) error,| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() (func(int, string) error,) {}", lines[1])
+    end)
+
+    it("should set cursor to the comma", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi closure with arguments return with cursor at the end of the second type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func(context.Context) error, func(int) bool| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() (func(context.Context) error, func(int) bool) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("l", char)
+    end)
+  end)
+
+  describe("when a closure with multiple returns with arguments with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func(int) (string, error)| {}")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() func(int) (string, error) {}", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(")", char)
+    end)
+  end)
+
   describe(
     "when a single return with comma has an invalid proceeding type definition with cursor in return definition",
     function()
@@ -1907,6 +2392,160 @@ describe("test methods without a body defined", function()
     it("should keep the cursor on the i", function()
       local char = utils.get_cursor_char(winid)
       eq(" ", char)
+    end)
+  end)
+
+  describe("when a single closure return with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func() i|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() func() i", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("i", char)
+    end)
+  end)
+
+  describe("when a multi closure return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func() i,|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() (func() i,)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi closure return with cursor at the end of the second type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func() i, func() k|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() (func() i, func() k)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("k", char)
+    end)
+  end)
+
+  describe("when a single closure with arguments return with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func(int) string|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() func(int) string", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("g", char)
+    end)
+  end)
+
+  describe("when a multi closure with arguments return with cursor at the end of the comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func(int, string) error,|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() (func(int, string) error,)", lines[1])
+    end)
+
+    it("should set cursor to the comma", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a multi closure with arguments return with cursor at the end of the second type", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func(context.Context) error, func(int) bool|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() (func(context.Context) error, func(int) bool)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("l", char)
+    end)
+  end)
+
+  describe("when a closure with multiple returns with arguments with cursor at the end", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value("func (b *Bar) Foo() func(int) (string, error)|")
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      eq("func (b *Bar) Foo() func(int) (string, error)", lines[1])
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq(")", char)
     end)
   end)
 
