@@ -200,6 +200,11 @@ function M.parse_return()
     return
   end
 
+  if return_def_coords.start_row > return_def_coords.end_row or return_def_coords.start_col > return_def_coords.end_col then
+    vim.notify("AutoFixReturn: Invalid return definition coordinates", vim.log.levels.DEBUG)
+    return
+  end
+
   local line = vim.api.nvim_buf_get_text(
     0,
     return_def_coords.start_row,
