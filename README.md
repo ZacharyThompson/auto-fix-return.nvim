@@ -26,14 +26,16 @@ and hopefully all combinations of the above. If you find a bug please report it 
 > You can run the command `AutoFixReturn disable` to turn off the autocommnd and make whatever changes you need to that line. 
 > Then reenable the plugin with `AutoFixReturn enable` and the line will not be edited unless you touch the declarations return definition again.
 
-> [!NOTE]
+> [!TIP]
 > You can always invoke the fix manually with `AutoFixReturn` as long as your cursor is in the return definition.
 
 ## Compatibility
 
 Due to attempting to use in progress or invalid parse trees this plugin is very sensitive to changes in the compiled version of the underlying Go treesitter parer.
 
-The current tested version of the Go parser that this plugin was written against is [5e73f476efafe5c768eda19bbe877f188ded6144](https://github.com/tree-sitter/tree-sitter-go/commit/5e73f476efafe5c768eda19bbe877f188ded6144)
+
+> [!IMPORTANT]
+> The current tested version of the Go parser that this plugin was written against is [5e73f476efafe5c768eda19bbe877f188ded6144](https://github.com/tree-sitter/tree-sitter-go/commit/5e73f476efafe5c768eda19bbe877f188ded6144)
 
 > [!NOTE]
 > If you are using `nvim-treesitter` you can view your installed Go parser version with the following command
