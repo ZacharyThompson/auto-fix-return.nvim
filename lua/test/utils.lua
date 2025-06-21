@@ -30,7 +30,7 @@ end
 -- Initialize common Neovim options for testing per busted file
 function M.initialize_test_nvim_opts()
   -- Add the Go parser to the treesitter language list explicitly for our test runs
-  vim.treesitter.language.add('go', { path = "./testbin/parser/go.so" })
+  vim.treesitter.language.add("go", { path = "./testbin/parser/go.so" })
 
   -- Disable swap and other file operations for CI
   vim.opt.swapfile = false
@@ -38,7 +38,6 @@ function M.initialize_test_nvim_opts()
   vim.opt.writebackup = false
   vim.opt.undofile = false
 end
-
 
 ---@param winid integer
 ---@return string[]
