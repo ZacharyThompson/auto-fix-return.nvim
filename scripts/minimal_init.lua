@@ -1,5 +1,6 @@
 vim.opt.rtp:append(".")
 vim.opt.rtp:append("./testbin/plenary.nvim/")
+vim.opt.rtp:append("./testbin/")
 
 local plenary_files = vim.fn.globpath(vim.o.rtp, "plugin/plenary.vim", false, true)
 for _, file in ipairs(plenary_files) do

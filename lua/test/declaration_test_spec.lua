@@ -2,6 +2,9 @@ require("plenary.test_harness")
 local eq = assert.are.same
 local utils = require("test.utils")
 
+-- Add the Go parser to the treesitter language list explicitly for our test runs
+vim.treesitter.language.add('go', { path = "./testbin/parser/go.so" })
+
 local autofix = require("auto-fix-return")
 autofix.setup({ enabled = false })
 
