@@ -3,7 +3,7 @@ local eq = assert.are.same
 local utils = require("test.utils")
 
 local autofix = require("auto-fix-return")
-autofix.setup({ enable_autocmds = false })
+autofix.setup({ enabled = false })
 
 describe("test interface method declarations", function()
   describe("when a single return is started with cursor at the end of the first type", function()

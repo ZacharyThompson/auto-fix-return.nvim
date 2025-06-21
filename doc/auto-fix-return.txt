@@ -3,7 +3,8 @@
 #### Defaults
 ```lua
 require("auto-fix-return").setup({
-  enable_autocmds = true, -- Enable or disable the autofix on type behvaior
+  -- Enable or disable the autofix on type behvaior
+  enabled = true, 
 })
 ```
 
@@ -11,7 +12,6 @@ require("auto-fix-return").setup({
 
 `AutoFixReturn`: Format the function definition under the cursor, adding or removing parenthesis as needed
 
-`AutoFixReturn enable`: Enable the autofix on type autocommands
+`AutoFixReturn enable`: Enable the autofix on type behavior
 
-`AutoFixReturn disable`: Disable the autofix on type autocommands
-
+`AutoFixReturn disable`: Disable the autofix on type behavior

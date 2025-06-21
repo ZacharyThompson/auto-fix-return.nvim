@@ -5,14 +5,39 @@ local M = {}
 local command_id = 0
 local registered_ts_cbs_bufs = {}
 
-M.setup_user_commands = function()
+local TESTED_PARSER_REV = "5e73f476efafe5c768eda19bbe877f188ded6144"
+
+---If possible pull the installed TreeSitter parser version from 'nvim-treesitter'
+---@return string|nil
+function M.get_parser_version()
+  local ts_config = require("nvim-treesitter.configs")
+  if ts_config == nil then
+    return nil
+  end
+
+  local rev_file = io.open(ts_config.get_parser_info_dir() .. "/go.revision")
+
+  if rev_file == nil then
+    return nil
+  end
+
+  local rev = rev_file:read("*a")
+  local value = string.gsub(rev, '"', "")
+  value = string.gsub(value, "\n", "")
+
+  return value
+end
+
+function M.setup_user_commands()
   vim.api.nvim_create_user_command("AutoFixReturn", function(opts)
     if #opts.fargs == 0 then
       fix.wrap_golang_return()
     elseif opts.fargs[1] == "enable" then
       M.enable_tree_cbs()
+      vim.notify("AutoFixReturn: Enabled on all buffers", vim.log.levels.INFO)
     elseif opts.fargs[1] == "disable" then
       M.disable_ts_cbs()
+      vim.notify("AutoFixReturn: Disabled on all buffers", vim.log.levels.INFO)
     end
   end, {
     nargs = "?",
@@ -22,7 +47,21 @@ M.setup_user_commands = function()
   })
 end
 
-M.enable_tree_cbs = function()
+function M.enable_tree_cbs()
+  local rev = M.get_parser_version()
+
+  if rev ~= nil and rev ~= TESTED_PARSER_REV then
+    vim.notify(
+      "AutoFixReturn: Current Go treesitter parser version '"
+        .. rev
+        .. "' is not tested with this plugin.\n"
+        .. "If you encounter issues please upgrade your Go Treesitter parser to the tested version '"
+        .. TESTED_PARSER_REV
+        .. "'",
+      vim.log.levels.WARN
+    )
+  end
+
   for bufnr, _ in pairs(registered_ts_cbs_bufs) do
     registered_ts_cbs_bufs[bufnr] = true
   end
@@ -36,8 +75,6 @@ M.enable_tree_cbs = function()
       end
     end
   end
-
-  vim.notify("AutoFixReturn: Enabled on buffers", vim.log.levels.INFO)
 
   if command_id ~= 0 then
     return
@@ -78,7 +115,7 @@ function M.register_buf_cbs(bufnr)
       end
       processing = true
       vim.schedule(function()
-        M.wrap_golang_return()
+        fix.wrap_golang_return()
         processing = false
       end)
     end,
@@ -89,7 +126,6 @@ function M.disable_buf_ts_cbs()
   for bufnr, _ in pairs(registered_ts_cbs_bufs) do
     registered_ts_cbs_bufs[bufnr] = false
   end
-  vim.notify("AutoFixReturn: Disabled on buffers", vim.log.levels.INFO)
 end
 
 function M.disable_ts_cbs()
