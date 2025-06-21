@@ -813,4 +813,148 @@ describe("test interface method declarations", function()
       end)
     end
   )
+
+  describe(
+    "when a single function interface has multi return with only one starting parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bar() (i,k|",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "type Foo interface {",
+          "  Bar() (i,k)",
+          "}",
+        }
+        eq(expected, lines)
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("k", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a single function interface has multi return with only one ending parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bar() i|,k)",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "type Foo interface {",
+          "  Bar() (i,k)",
+          "}",
+        }
+        eq(expected, lines)
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("(", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a multiple function interface has multi return with only one starting parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bax() int",
+          "  Bar() (i,k|",
+          "  Baz() string",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "type Foo interface {",
+          "  Bax() int",
+          "  Bar() (i,k)",
+          "  Baz() string",
+          "}",
+        }
+        eq(expected, lines)
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("k", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a multiple function interface has multi return with only one ending parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bax() int",
+          "  Bar() i|,k)",
+          "  Baz() string",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "type Foo interface {",
+          "  Bax() int",
+          "  Bar() (i,k)",
+          "  Baz() string",
+          "}",
+        }
+        eq(expected, lines)
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("(", char)
+      end)
+    end
+  )
 end)

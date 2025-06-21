@@ -50,6 +50,46 @@ function M.parse_interface(cursor_row)
         .
         (ERROR)? @outside_error_end
       )
+
+      ;; Special parsing cases for the following code
+      ;; 
+      ;; type baz interface {
+      ;; 	Baz() i|,k)
+      ;; }
+      ;; ||
+      ;; type baz interface {
+      ;; 	Baz() (i,k
+      ;; }
+      ;; This is parsed as either the entire type return in the outside error or 
+      ;; the initial type identifier found in result
+      (
+        (method_elem
+          name: (_)
+          parameters: (_) 
+          result: (_)? @result
+        ) @func
+        .
+        (ERROR) @outside_error_end
+      )
+
+      ;; This is a special case for a multi method interface type with a missing end parentheses
+      ;; type Foo interface {
+      ;;   Bax() int
+      ;;   Baz() (i,k,l|
+      ;;   Bar() string
+      ;; }
+      (
+        (method_elem
+          name: (_)
+          parameters: (_) 
+          result: (parameter_list
+            (parameter_declaration
+              name: (identifier) @name
+            )
+            (ERROR)?
+          ) @result_start
+        ) @func
+      )
 	]
   ]]
   )
@@ -86,6 +126,10 @@ function M.parse_interface(cursor_row)
       if final_end_col == 0 then
         final_end_col = end_col
       end
+    elseif capture_name == "name" then
+      if end_col > final_end_col then
+        final_end_col = end_col
+      end
     elseif capture_name == "error_end" then
       final_end_col = end_col
     elseif capture_name == "outside_error_end" then
@@ -98,10 +142,13 @@ function M.parse_interface(cursor_row)
 
     ::continue::
 
-    -- The outside_error_above token stretches across multiple rows so
+    -- These capture edge cases stretch token stretches across multiple rows so
     -- we need to check it every time even if the continue check above fires
     if capture_name == "outside_error_above" then
       final_end_col = end_col
+    end
+    if capture_name == "result_start" then
+      final_start_col = start_col
     end
   end
 
