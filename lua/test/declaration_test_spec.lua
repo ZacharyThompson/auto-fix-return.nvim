@@ -5,6 +5,12 @@ local utils = require("test.utils")
 -- Add the Go parser to the treesitter language list explicitly for our test runs
 vim.treesitter.language.add('go', { path = "./testbin/parser/go.so" })
 
+-- Disable swap and other file operations for CI
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.writebackup = false
+vim.opt.undofile = false
+
 local autofix = require("auto-fix-return")
 autofix.setup({ enabled = false })
 
