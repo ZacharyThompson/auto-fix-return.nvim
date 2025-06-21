@@ -33,7 +33,7 @@ and hopefully all combinations of the above. If you find a bug please report it 
 
 Due to attempting to use in progress or invalid parse trees this plugin is very sensitive to changes in the compiled version of the underlying Go treesitter parer.
 
-The current tested version of the Go parser that this plugin was written against is https://github.com/tree-sitter/tree-sitter-go/commit/5e73f476efafe5c768eda19bbe877f188ded6144
+The current tested version of the Go parser that this plugin was written against is [5e73f476efafe5c768eda19bbe877f188ded6144](https://github.com/tree-sitter/tree-sitter-go/commit/5e73f476efafe5c768eda19bbe877f188ded6144)
 
 > [!NOTE]
 > If you are using `nvim-treesitter` you can view your installed Go parser version with the following command
