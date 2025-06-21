@@ -231,7 +231,7 @@ function M.parse_return()
   -- ->
   -- func (f Foo) () int {}
   -- This parse will break without the final_start_col offset
-  if cursor_col < return_def_coords.start_col + 1 or cursor_col > return_def_coords.end_col then
+  if cursor_col < return_def_coords.start_col or cursor_col > return_def_coords.end_col then
     return
   end
 
