@@ -49,8 +49,27 @@ end
 ---@return FixedDefinition
 function M.build_fixed_definition(line, cursor_col)
   -- Strip the parens off, we will add them back if we need to
-  local value = string.gsub(line, "^%(", "")
-  value = string.gsub(value, "%)$", "")
+  local temp, count_left = string.gsub(line, "^%(", "")
+  local value, count_right = string.gsub(temp, "%)$", "")
+
+  -- In the case that we ONLY remove the one paren then it is most likely
+  -- that the user is performing a backspace of the entire return on either parentheses,
+  -- E.G.
+  -- func Foo() (int, error)|<bs> {}
+  -- ->
+  -- func Foo() (int, error| {}
+  -- ->
+  -- func Foo() (int, error|) {}
+  --
+  -- in this case when we rebuild the return type and add back the removed paren we would also set the cursor 
+  -- back to its original position effectively removing the users ability to backspace. 
+  --
+  -- If we detect that case mark it here and simply do not modify the cursor at the end
+  local needs_cursor_moved = true
+  if count_left ~= count_right then
+    needs_cursor_moved = false
+  end
+
   -- If there are any commas in the return definition we know we will need parenthesis
   local returns = vim.split(value, ",")
 
@@ -92,7 +111,6 @@ function M.build_fixed_definition(line, cursor_col)
 
       -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
       if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil or curr_word:find("^func")) then
-        -- vim.print(curr_word)
         -- Peek ahead to find the next non-space character
         -- so that we can ignore whitespace in return definitions like `interface   {}`
         -- we then do a stack approach to ensure we only add a return definition if we have validated
@@ -131,12 +149,16 @@ function M.build_fixed_definition(line, cursor_col)
 
   -- If returns just equals one we know we have a single return and do
   -- not need parenthesis
-  -- Here we also need to set the offset for the CURSOR to be placed after we do the text replacement
+  -- Here we also need to possibly set the offset for the CURSOR to be placed after we do the text replacement
   if #returns == 1 then
-    final_cursor_col = final_cursor_col - 1
+    if needs_cursor_moved then
+      final_cursor_col = final_cursor_col - 1
+    end
     new_line = value
   else
-    final_cursor_col = final_cursor_col + 1
+    if needs_cursor_moved then
+      final_cursor_col = final_cursor_col + 1
+    end
     new_line = "(" .. value .. ")"
   end
 
@@ -185,6 +207,7 @@ function M.parse_return()
   if line == "" then
     return
   end
+
 
   -- Here we rebuild the entire return statement to a syntactically correct version
   -- splitting on commas to decide if there is a parameter list or a single value

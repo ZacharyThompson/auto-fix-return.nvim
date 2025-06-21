@@ -590,6 +590,48 @@ describe("test functions with body defined", function()
     end
   )
 
+  describe(
+    "when a multi return only has one starting parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() (i,k| {}")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (i,k) {}", lines[1])
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("k", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a multi return only has one ending parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() i|,k) {}")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (i,k) {}", lines[1])
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("(", char)
+      end)
+    end
+  )
+
   describe("when a multi return is started with cursor at the end of the second type", function()
     local winid = 0
     before_each(function()
@@ -1025,6 +1067,48 @@ describe("test functions without a body defined", function()
       eq(",", char)
     end)
   end)
+
+  describe(
+    "when a multi return only has one starting parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() (i,k|")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (i,k)", lines[1])
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("k", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a multi return only has one ending parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() i|,k) {}")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (i,k) {}", lines[1])
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("(", char)
+      end)
+    end
+  )
 
   describe("when a multi closure return with cursor at the end of the second type", function()
     local winid = 0
@@ -2279,6 +2363,49 @@ describe("test methods with body defined", function()
       eq("F", char)
     end)
   end)
+  
+  describe(
+    "when a multi return only has one starting parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() (i,k| {}")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (i,k) {}", lines[1])
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("k", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a multi return only has one ending parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() i|,k) {}")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (i,k) {}", lines[1])
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("(", char)
+      end)
+    end
+  )
+
 
   describe(
     "when a multi inline interface return is started with cursor at the end of the comma",
@@ -2780,6 +2907,48 @@ describe("test methods without a body defined", function()
       it("should not touch the cursor", function()
         local char = utils.get_cursor_char(winid)
         eq("t", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a multi return only has one starting parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func (b *Bar) Foo() (i,k|")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func (b *Bar) Foo() (i,k)", lines[1])
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("k", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a multi return only has one ending parentheses",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() i|,k) {}")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (i,k) {}", lines[1])
+      end)
+
+      it("should set the cursor to inside the parens", function()
+        local char = utils.get_cursor_char(winid)
+        eq("(", char)
       end)
     end
   )

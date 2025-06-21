@@ -59,6 +59,20 @@ function M.parse_declaration(cursor_row)
         (ERROR)? @outside_error_end
       )
 
+      ;; For the following code
+      ;; func Foo() (string, int| {}
+      ;; There is no 'result' node parsed, the error token contains the entire thing
+      ;; so we need to special case this input
+      (
+        (function_declaration
+          name: (_)
+          parameters: (_) 
+          (ERROR)? @result
+          !result
+          body: (_)
+        ) @func
+      )
+
       ;; The following code 
       ;;
       ;; func (b *Bar) Foo() i, 
@@ -89,6 +103,20 @@ function M.parse_declaration(cursor_row)
         ;; with the final error token for the , outside of the method_declaration
         (ERROR)? @outside_error_end
       )
+      ;; For the following code
+      ;; func (b *Bar) Foo() (string, int| {}
+      ;; There is no 'result' node parsed, the error token contains the entire thing
+      ;; so we need to special case this input
+      (
+        (method_declaration
+          name: (_)
+          parameters: (_) 
+          (ERROR)? @result
+          !result
+          body: (_)
+        ) @func
+      )
+
       ;; For methods that are created above existing valid declarations treesitter
       ;; parses the tree with the error token outside the function declaration and no result field
       ;; so we need to handle that here
