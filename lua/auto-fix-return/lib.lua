@@ -7,6 +7,8 @@ local registered_ts_cbs_bufs = {}
 
 local TESTED_PARSER_REV = "5e73f476efafe5c768eda19bbe877f188ded6144"
 
+local last_changenr = 0
+
 ---If possible pull the installed TreeSitter parser version from 'nvim-treesitter'
 ---@return string|nil
 function M.get_parser_version()
@@ -113,9 +115,19 @@ function M.register_buf_cbs(bufnr)
       if processing then
         return
       end
+
+      -- If we detect an undo then bail out so we do not
+      -- cause a infinite loop of the plugin constantly immediately reapplying its own changes
+      local curr_changenr = vim.fn.changenr()
+      if curr_changenr < last_changenr then
+        last_changenr = curr_changenr
+        return
+      end
+
       processing = true
       vim.schedule(function()
         fix.wrap_golang_return()
+        last_changenr = curr_changenr
         processing = false
       end)
     end,
