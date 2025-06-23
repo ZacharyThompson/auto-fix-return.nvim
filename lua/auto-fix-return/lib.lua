@@ -9,11 +9,22 @@ local TESTED_PARSER_REV = "5e73f476efafe5c768eda19bbe877f188ded6144"
 
 local last_changenr = 0
 
+-- Optionally load a module and return nil if it fails, or the module if it succeeds.
+---@return any|nil
+function prequire(m)
+  local ok, mod = pcall(require, m)
+  if not ok then
+    return nil
+  end
+  return mod
+end
+
 ---If possible pull the installed TreeSitter parser version from 'nvim-treesitter'
 ---@return string|nil
 function M.get_parser_version()
-  local ts_config = require("nvim-treesitter.configs")
+  local ts_config = prequire("nvim-treesitter.configs")
   if ts_config == nil then
+    vim.notify("AutoFixReturn: failed to load nvim-treesitter.configs", vim.log.levels.DEBUG)
     return nil
   end
 
