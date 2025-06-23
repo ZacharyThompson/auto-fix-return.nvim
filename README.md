@@ -26,11 +26,18 @@ and hopefully all combinations of the above. If you find a bug please report it 
 > This is very nice to use but makes it very difficult to cover all edgecases from a parsing standpoint, as different error states of the tree can be matched incorectly.
 > If you find an error state that is not covered please report it as an issue.
 >
-> You can run the command `AutoFixReturn disable` to turn off the autocommnd and make whatever changes you need to that line.
+> You can run the command `AutoFixReturn disable` to turn off the autocommand and make whatever changes you need to that line.
 > Then reenable the plugin with `AutoFixReturn enable` and the line will not be edited unless you touch the declarations return definition again.
 
 > [!TIP]
 > You can always invoke the fix manually with `AutoFixReturn` as long as your cursor is in the return definition.
+
+> [!NOTE]
+> To ensure that that we are not overly aggressive in the fixes that we apply and break unrelated code, whenever a fix is found, the contents of the current buffer and the fix are first copied to a scratch buffer and a full TreeSitter parse is run there before the fix is applied to the live buffer. If the buffer with the proposed fix from the builder contains **ANY** parse errors in it the fix will be ignored. 
+>
+> This is because in rare cases treesitter error tokens can apply across an arbitrary number of rows and we would end up deleting large swathes of code which is not what we want. 
+>
+> In practice this means that an invalid syntax error elsewhere in the buffer will essentially disable this plugin for that buffer. 
 
 ## Compatibility
 

@@ -61,8 +61,8 @@ function M.build_fixed_definition(line, cursor_col)
   -- ->
   -- func Foo() (int, error|) {}
   --
-  -- in this case when we rebuild the return type and add back the removed paren we would also set the cursor 
-  -- back to its original position effectively removing the users ability to backspace. 
+  -- in this case when we rebuild the return type and add back the removed paren we would also set the cursor
+  -- back to its original position effectively removing the users ability to backspace.
   --
   -- If we detect that case mark it here and simply do not modify the cursor at the end
   local needs_cursor_moved = true
@@ -110,7 +110,14 @@ function M.build_fixed_definition(line, cursor_col)
       end
 
       -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
-      if c == " " and not (curr_word:find("^chan") ~= nil or curr_word:find("chan$") ~= nil or curr_word:find("^func")) then
+      if
+        c == " "
+        and not (
+          curr_word:find("^chan") ~= nil
+          or curr_word:find("chan$") ~= nil
+          or curr_word:find("^func")
+        )
+      then
         -- Peek ahead to find the next non-space character
         -- so that we can ignore whitespace in return definitions like `interface   {}`
         -- we then do a stack approach to ensure we only add a return definition if we have validated
