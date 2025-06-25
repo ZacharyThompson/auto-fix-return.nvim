@@ -28,7 +28,13 @@ function M.get_parser_version()
     return nil
   end
 
-  local rev_file = io.open(ts_config.get_parser_info_dir() .. "/go.revision")
+  local info_dir = ts_config.get_parser_info_dir()
+  if info_dir == nil then
+    vim.notify("AutoFixReturn: failed to get nvim-treesitter parser info directory", vim.log.levels.DEBUG)
+    return nil
+  end
+
+  local rev_file = io.open(info_dir .. "/go.revision")
 
   if rev_file == nil then
     return nil
