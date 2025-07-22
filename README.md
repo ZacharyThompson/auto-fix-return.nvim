@@ -88,6 +88,10 @@ return {
 require("auto-fix-return").setup({
   -- Enable or disable the autofix on type behvaior
   enabled = true,
+  
+  -- Default logging level for the plugin, if the plugin does not behave as it should
+  -- set this to vim.log.levels.DEBUG
+  log_level = vim.log.levels.INFO
 })
 ```
 

@@ -1,3 +1,5 @@
+require("auto-fix-return.log")
+
 local declaration = require("auto-fix-return.parsers.declaration")
 local interface = require("auto-fix-return.parsers.interface")
 
@@ -190,7 +192,7 @@ function M.parse_return()
   end
 
   if return_def_coords == nil then
-    vim.notify("AutoFixReturn: No valid return definition found", vim.log.levels.DEBUG)
+    log("AutoFixReturn: No valid return definition found", vim.log.levels.DEBUG)
     return
   end
 
@@ -198,7 +200,7 @@ function M.parse_return()
     return_def_coords.start_row > return_def_coords.end_row
     or return_def_coords.start_col > return_def_coords.end_col
   then
-    vim.notify("AutoFixReturn: Invalid return definition coordinates", vim.log.levels.DEBUG)
+    log("AutoFixReturn: Invalid return definition coordinates", vim.log.levels.DEBUG)
     return
   end
 
@@ -257,7 +259,7 @@ function M.wrap_golang_return()
 
   local valid_fix = M.validate_fix(0, parse_fix)
   if not valid_fix then
-    vim.notify("AutoFixReturn: Invalid return fix, not applying", vim.log.levels.DEBUG)
+    log("AutoFixReturn: Invalid return fix, not applying", vim.log.levels.DEBUG)
     return
   end
 

@@ -1,23 +1,32 @@
+require("auto-fix-return.log")
+
 local lib = require("auto-fix-return.lib")
 
 local M = {}
-
----@class AutoFixReturnConfig
+---@class AutoFixReturnConfigInternal
 ---@field enabled boolean
+---@field log_level integer
 
----@return AutoFixReturnConfig
+---@return AutoFixReturnConfigInternal
 function M.get_default_config()
   local config = {
     enabled = true,
+    log_level = vim.log.levels.INFO,
   }
 
   return config
 end
 
+---@class AutoFixReturnConfig
+---@field enabled boolean|nil
+---@field log_level integer|nil
+
 ---@param config AutoFixReturnConfig
 function M.setup(config)
   local default_config = M.get_default_config()
   local final_config = vim.tbl_deep_extend("force", default_config, config)
+
+  set_log_level(final_config.log_level)
 
   if final_config.enabled then
     lib.enable_tree_cbs()

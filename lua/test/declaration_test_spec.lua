@@ -5,7 +5,10 @@ local utils = require("test.utils")
 utils.initialize_test_nvim_opts()
 
 local autofix = require("auto-fix-return")
-autofix.setup({ enabled = false })
+autofix.setup({
+  enabled = false,
+  log_level = vim.log.levels.DEBUG,
+})
 
 describe("test functions with body defined", function()
   describe("when a single return is started with cursor at the end of the first type", function()

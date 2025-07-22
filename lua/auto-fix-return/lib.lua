@@ -1,3 +1,5 @@
+require("auto-fix-return.log")
+
 local fix = require("auto-fix-return.fix")
 
 local M = {}
@@ -24,13 +26,13 @@ end
 function M.get_parser_version()
   local ts_config = prequire("nvim-treesitter.configs")
   if ts_config == nil then
-    vim.notify("AutoFixReturn: failed to load nvim-treesitter.configs", vim.log.levels.DEBUG)
+    log("AutoFixReturn: failed to load nvim-treesitter.configs", vim.log.levels.DEBUG)
     return nil
   end
 
   local info_dir = ts_config.get_parser_info_dir()
   if info_dir == nil then
-    vim.notify("AutoFixReturn: failed to get nvim-treesitter parser info directory", vim.log.levels.DEBUG)
+    log("AutoFixReturn: failed to get nvim-treesitter parser info directory", vim.log.levels.DEBUG)
     return nil
   end
 
@@ -53,10 +55,10 @@ function M.setup_user_commands()
       fix.wrap_golang_return()
     elseif opts.fargs[1] == "enable" then
       M.enable_tree_cbs()
-      vim.notify("AutoFixReturn: Enabled on all buffers", vim.log.levels.INFO)
+      log("AutoFixReturn: Enabled on all buffers", vim.log.levels.INFO)
     elseif opts.fargs[1] == "disable" then
       M.disable_ts_cbs()
-      vim.notify("AutoFixReturn: Disabled on all buffers", vim.log.levels.INFO)
+      log("AutoFixReturn: Disabled on all buffers", vim.log.levels.INFO)
     end
   end, {
     nargs = "?",
@@ -70,7 +72,7 @@ function M.enable_tree_cbs()
   local rev = M.get_parser_version()
 
   if rev ~= nil and rev ~= TESTED_PARSER_REV then
-    vim.notify(
+    log(
       "AutoFixReturn: Current Go treesitter parser version '"
         .. rev
         .. "' is not tested with this plugin.\n"
