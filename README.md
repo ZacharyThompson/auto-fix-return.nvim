@@ -2,7 +2,7 @@
 
 [![Test](https://github.com/Jay-Madden/auto-fix-return.nvim/actions/workflows/run-tests.yml/badge.svg)](https://github.com/Jay-Madden/auto-fix-return.nvim/actions/workflows/run-tests.yml)
 
-Adds or removes parenthesis from Golang return defintions as you type.
+Plugin inspired by GoLand that adds or removes parenthesis from Golang return defintions as you type.
 
 Supports
 - Functions
