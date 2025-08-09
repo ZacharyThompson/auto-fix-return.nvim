@@ -166,6 +166,192 @@ describe("test interface method declarations", function()
     end)
   end)
 
+  describe("when a single generic return has one paramater", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "type Foo interface {",
+        "  Bar() foo[T]|",
+        "}",
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "type Foo interface {",
+        "  Bar() foo[T]",
+        "}",
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("]", char)
+    end)
+  end)
+
+  describe("when a single generic return has two paramaters with a space", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "type Foo interface {",
+        "  Bar() foo[T, V]|",
+        "}",
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "type Foo interface {",
+        "  Bar() foo[T, V]",
+        "}",
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("]", char)
+    end)
+  end)
+
+  describe("when a single generic return has two paramaters without a space", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "type Foo interface {",
+        "  Bar() foo[T,V]|",
+        "}",
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should not add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "type Foo interface {",
+        "  Bar() foo[T,V]",
+        "}",
+      }
+      eq(expected, lines)
+    end)
+
+    it("should not touch the cursor", function()
+      local char = utils.get_cursor_char(winid)
+      eq("]", char)
+    end)
+  end)
+
+  describe("when a single generic return has one parameter with trailing comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "type Foo interface {",
+        "  Bar() foo[T],|",
+        "}",
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "type Foo interface {",
+        "  Bar() (foo[T],)",
+        "}",
+      }
+      eq(expected, lines)
+    end)
+
+    it("should set cursor at the comma", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a single generic return has two parameters with space and trailing comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "type Foo interface {",
+        "  Bar() foo[T, V],|",
+        "}",
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "type Foo interface {",
+        "  Bar() (foo[T, V],)",
+        "}",
+      }
+      eq(expected, lines)
+    end)
+
+    it("should set cursor at the comma", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
+  describe("when a single generic return has two parameters without space and trailing comma", function()
+    local winid = 0
+    before_each(function()
+      winid = utils.set_test_window_value({
+        "type Foo interface {",
+        "  Bar() foo[T,V],|",
+        "}",
+      })
+      vim.cmd("AutoFixReturn")
+    end)
+
+    after_each(function()
+      utils.cleanup_test(winid)
+    end)
+
+    it("should add parentheses around the return type", function()
+      local lines = utils.get_win_lines(winid)
+      local expected = {
+        "type Foo interface {",
+        "  Bar() (foo[T,V],)",
+        "}",
+      }
+      eq(expected, lines)
+    end)
+
+    it("should set cursor at the comma", function()
+      local char = utils.get_cursor_char(winid)
+      eq(",", char)
+    end)
+  end)
+
   describe("when a single return has parentheses already", function()
     local winid = 0
     before_each(function()

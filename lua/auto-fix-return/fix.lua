@@ -72,12 +72,14 @@ function M.build_fixed_definition(line, cursor_col)
     needs_cursor_moved = false
   end
 
-  -- If there are any commas in the return definition we know we will need parenthesis
-  local returns = vim.split(value, ",")
-
   local function trim_end(s)
     return s:gsub("%s+$", "")
   end
+
+  -- mapping of opening and closing brackets
+  local opens = { ["{"]=true, ["["]=true, ["("]=true }
+  local closes = { ["}"]=true, ["]"]=true, [")"]=true }
+
 
   -- If we do not have any commas we might still be doing a named return
   -- `E.G func foo() err e` <- once the e is typed we know a named return has been
@@ -87,88 +89,97 @@ function M.build_fixed_definition(line, cursor_col)
   --
   -- This section is essentially a small parser for go type decls as a declaration
   -- can have arbitrary amount of spaces which can masquarede as a named return
-  if #returns == 1 then
-    local trimmed = trim_end(value)
+  local trimmed = trim_end(value)
 
-    local temp_returns = {}
-    local curr_word = ""
-    local bracket_stack = {}
+  local needs_parens = false
+  local curr_word = ""
+  local bracket_stack = {}
 
-    -- We iterate over the string and split it on spaces to build up a possible named return
-    --
-    -- NOTE: `chan` syntax is unique in that a single return that is a channel type DOES NOT
-    -- require parenthesis, this is for all forms of channel including `chan` `<-chan` and `chan<-`
-    -- NOTE: `func()` syntax is also unique in that it can contain arbitrary amounts of spaces that
-    -- should not be considered a named return
-    -- TODO: This should be rewritten into a more robust parser
-    for i = 1, #trimmed do
-      local c = trimmed:sub(i, i)
+  -- We iterate over the string and parse out the nested bracket constructs to build up a possible return needing parens
+  -- accounting for the possibility of named returns mixed with standard multi returnt
+  --
+  -- NOTE: `chan` syntax is unique in that a single return that is a channel type DOES NOT
+  -- require parenthesis, this is for all forms of channel including `chan` `<-chan` and `chan<-`
+  -- NOTE: `func()` syntax is also unique in that it can contain arbitrary amounts of spaces that
+  -- should not be considered a named return
+  -- TODO: This should be rewritten into a more robust parser
+  for i = 1, #trimmed do
+    local c = trimmed:sub(i, i)
 
-      if c == "{" or c == "[" or c == "(" then
-        table.insert(bracket_stack, #bracket_stack + 1, c)
-      end
-      if c == "}" or c == "]" or c == ")" then
-        table.remove(bracket_stack, #bracket_stack)
-      end
-
-      -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
-      if
-        c == " "
-        and not (
-          curr_word:find("^chan") ~= nil
-          or curr_word:find("chan$") ~= nil
-          or curr_word:find("^func")
-        )
-      then
-        -- Peek ahead to find the next non-space character
-        -- so that we can ignore whitespace in return definitions like `interface   {}`
-        -- we then do a stack approach to ensure we only add a return definition if we have validated
-        -- that we have gotten to the end of all bracket pairs E.G `string[ interface { } ]`
-        local next_char = nil
-        for j = i + 1, #trimmed do
-          local peek = trimmed:sub(j, j)
-          if peek ~= " " then
-            next_char = peek
-            break
-          end
-        end
-
-        if next_char == "{" or next_char == "[" or next_char == "(" then
-          table.insert(bracket_stack, #bracket_stack + 1, next_char)
-        end
-
-        if #bracket_stack == 0 then
-          temp_returns[#temp_returns + 1] = curr_word
-          curr_word = ""
-        end
-      end
-
-      curr_word = curr_word .. c
+    if opens[c] then
+      table.insert(bracket_stack, #bracket_stack + 1, c)
+    end
+    if closes[c] then
+      table.remove(bracket_stack, #bracket_stack)
     end
 
-    if curr_word ~= "" then
-      temp_returns[#temp_returns + 1] = curr_word
+    -- If we are inside of a bracket construct theres nothing here that could cause a multi return so just 
+    -- keep consuming more characters
+    -- TODO: Handle nested closure or inline interfaces
+    if #bracket_stack > 0 then
+      goto continue
     end
 
-    returns = temp_returns
+    -- If we find a comma outside of any brackets we know we have found a multi return
+    -- so we can just set the flag bail out here
+    if c == "," then
+      needs_parens = true
+      break
+    end
+
+    -- Handle the cases where a space can signify a named return is occuring, but only if its not one predetermined keywords
+    -- This technically does not handle a case like `func foo() chan<- int a b c` but as this will never be syntactically valid go code we can ignore it
+    -- TODO: Make the peek loop also advance the main iterator instead of duplicating work
+    if
+      c == " "
+      and not (
+        curr_word:find("^chan") ~= nil
+        or curr_word:find("chan$") ~= nil
+        or curr_word:find("^func")
+        or curr_word:find("^interface")
+      )
+    then
+      -- Peek ahead to find the next non-space character
+      -- so that we can ignore whitespace in return definitions like `interface   {}`
+      local next_char = nil
+      for j = i + 1, #trimmed do
+        local peek = trimmed:sub(j, j)
+        if peek ~= " " then
+          next_char = peek
+          break
+        end
+      end
+
+      -- Make sure we are not at the beginning of a new bracket pair before we decide we are at a named return and bail out
+      -- E.G
+      -- for the case of `func Foo() interface    {} {}`
+      -- We should not add parenthesis
+      if next_char ~= nil then
+        needs_parens = true
+        break
+      end
+    end
+
+    ::continue::
+
+    curr_word = curr_word .. c
   end
 
   local new_line = line
   local final_cursor_col = cursor_col
 
-  -- If returns just equals one we know we have a single return and do
-  -- not need parenthesis
+  -- Optionall add parens if the parse above detected the need for one
   -- Here we also need to possibly set the offset for the CURSOR to be placed after we do the text replacement
-  if #returns == 1 then
-    if needs_cursor_moved then
-      final_cursor_col = final_cursor_col - 1
-    end
-    new_line = value
-  else
+  if needs_parens then
     if needs_cursor_moved then
       final_cursor_col = final_cursor_col + 1
     end
     new_line = "(" .. value .. ")"
+  else
+    if needs_cursor_moved then
+      final_cursor_col = final_cursor_col - 1
+    end
+    new_line = value
   end
 
   return {
