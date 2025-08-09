@@ -77,9 +77,8 @@ function M.build_fixed_definition(line, cursor_col)
   end
 
   -- mapping of opening and closing brackets
-  local opens = { ["{"]=true, ["["]=true, ["("]=true }
-  local closes = { ["}"]=true, ["]"]=true, [")"]=true }
-
+  local opens = { ["{"] = true, ["["] = true, ["("] = true }
+  local closes = { ["}"] = true, ["]"] = true, [")"] = true }
 
   -- If we do not have any commas we might still be doing a named return
   -- `E.G func foo() err e` <- once the e is typed we know a named return has been
@@ -113,7 +112,7 @@ function M.build_fixed_definition(line, cursor_col)
       table.remove(bracket_stack, #bracket_stack)
     end
 
-    -- If we are inside of a bracket construct theres nothing here that could cause a multi return so just 
+    -- If we are inside of a bracket construct theres nothing here that could cause a multi return so just
     -- keep consuming more characters
     -- TODO: Handle nested closure or inline interfaces
     if #bracket_stack > 0 then

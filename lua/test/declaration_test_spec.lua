@@ -456,50 +456,55 @@ describe("test functions with body defined", function()
     end)
   end)
 
-  describe("when a single generic return has two parameters with space and trailing comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() foo[T, V],| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single generic return has two parameters with space and trailing comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() foo[T, V],| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (foo[T, V],) {}", lines[1])
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (foo[T, V],) {}", lines[1])
+      end)
 
-    it("should set cursor at the comma", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should set cursor at the comma", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when a single generic return has two parameters without space and trailing comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() foo[T,V],| {}")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single generic return has two parameters without space and trailing comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() foo[T,V],| {}")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (foo[T,V],) {}", lines[1])
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (foo[T,V],) {}", lines[1])
+      end)
 
-    it("should set cursor at the comma", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
-
+      it("should set cursor at the comma", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
   describe(
     "when a multi closure with arguments return with cursor at the end of the comma",
@@ -2975,7 +2980,8 @@ describe("test methods without a body defined", function()
         local char = utils.get_cursor_char(winid)
         eq(",", char)
       end)
-    end)
+    end
+  )
 
   describe("when a single generic return has one paramater", function()
     local winid = 0
@@ -3130,49 +3136,55 @@ describe("test methods without a body defined", function()
     end)
   end)
 
-  describe("when a single generic return has two parameters with space and trailing comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() foo[T, V],|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single generic return has two parameters with space and trailing comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() foo[T, V],|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (foo[T, V],)", lines[1])
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (foo[T, V],)", lines[1])
+      end)
 
-    it("should set cursor at the comma", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should set cursor at the comma", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
-  describe("when a single generic return has two parameters without space and trailing comma", function()
-    local winid = 0
-    before_each(function()
-      winid = utils.set_test_window_value("func Foo() foo[T,V],|")
-      vim.cmd("AutoFixReturn")
-    end)
+  describe(
+    "when a single generic return has two parameters without space and trailing comma",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() foo[T,V],|")
+        vim.cmd("AutoFixReturn")
+      end)
 
-    after_each(function()
-      utils.cleanup_test(winid)
-    end)
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
 
-    it("should add parentheses around the return type", function()
-      local lines = utils.get_win_lines(winid)
-      eq("func Foo() (foo[T,V],)", lines[1])
-    end)
+      it("should add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() (foo[T,V],)", lines[1])
+      end)
 
-    it("should set cursor at the comma", function()
-      local char = utils.get_cursor_char(winid)
-      eq(",", char)
-    end)
-  end)
+      it("should set cursor at the comma", function()
+        local char = utils.get_cursor_char(winid)
+        eq(",", char)
+      end)
+    end
+  )
 
   describe(
     "when a multi channel return is started with cursor at the end of the second type",
