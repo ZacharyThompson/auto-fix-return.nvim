@@ -119,3 +119,11 @@ just test
 ```
 
 Will clone and build the currently supported version of the Go treesitter parser and use that for the tests.
+
+## Git Hooks
+
+To enable the pre-commit hook that runs `just fmt`:
+
+```bash
+git config core.hooksPath hooks
+```

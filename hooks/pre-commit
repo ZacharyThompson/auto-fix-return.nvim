@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Run formatter before commit
+echo "Running formatter..."
+just fmt
+
+# Check if fmt made any changes
+if ! git diff --quiet; then
+    echo "Formatter made changes. Please stage the changes and commit again."
+    exit 1
+fi
+
+echo "Formatting check passed."

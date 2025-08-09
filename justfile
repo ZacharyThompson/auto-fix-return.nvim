@@ -1,6 +1,9 @@
 fmt:
     stylua lua/ --config-path=stylua.toml
 
+fmt-check:
+    stylua lua/ --check --config-path=stylua.toml
+
 install-plenary:
     #!/bin/bash
     echo "===== Setting up Plenary.nvim ====="
