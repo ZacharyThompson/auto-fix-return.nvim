@@ -136,6 +136,7 @@ function M.build_fixed_definition(line, cursor_col)
         or curr_word:find("chan$") ~= nil
         or curr_word:find("^func")
         or curr_word:find("^interface")
+        or curr_word:find("^struct")
       )
     then
       -- Peek ahead to find the next non-space character
