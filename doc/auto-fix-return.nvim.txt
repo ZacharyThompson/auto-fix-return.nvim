@@ -1,0 +1,136 @@
+*auto-fix-return.nvim.txt*
+
+==============================================================================
+CONTENTS                                       *auto-fix-return.nvim-contents*
+
+    1. Introduction ................ |auto-fix-return.nvim-introduction|
+    2. Installation ................ |auto-fix-return.nvim-installation|
+    3. Compatibility ............... |auto-fix-return.nvim-compatibility|
+    4. Configuration ............... |auto-fix-return.nvim-configuration|
+    5. Commands .................... |auto-fix-return.nvim-commands|
+    6. Usage Notes ................. |auto-fix-return.nvim-usage-notes|
+
+==============================================================================
+1. INTRODUCTION                            *auto-fix-return.nvim-introduction*
+
+Plugin inspired by GoLand that adds or removes parenthesis from Golang return
+definitions as you type.
+
+Supports:
+- Functions
+- Methods
+- Interfaces
+- Single returns
+- Multi returns
+- Named returns
+- Channel returns
+
+Coming soon:
+- Closures
+
+==============================================================================
+2. INSTALLATION                            *auto-fix-return.nvim-installation*
+
+Requirements:
+- Go treesitter parser must be installed
+- Run `TSInstall go` if using nvim-treesitter
+
+Lazy.nvim:
+>
+    return {
+      "Jay-Madden/auto-fix-return.nvim", 
+      event = "VeryLazy",
+
+      -- nvim-treesitter is optional, the plugin will work fine without it as long as
+      -- you have a valid Go parser in $rtp/parsers.
+      -- However due to the Go grammar not being on Treesitter ABI 15 without 'nvim-treesitter'
+      -- we are unable to detect and warn if an invalid parser version is being used.
+      dependencies = {
+        "nvim-treesitter/nvim-treesitter",
+      },
+
+      config = function()
+        require("auto-fix-return").setup({})
+      end
+    }
+<
+
+==============================================================================
+3. COMPATIBILITY                          *auto-fix-return.nvim-compatibility*
+
+Due to attempting to use in progress or invalid parse trees this plugin is
+very sensitive to changes in the compiled version of the underlying Go
+treesitter parser.
+
+The current tested version of the Go parser that this plugin was written
+against is: `5e73f476efafe5c768eda19bbe877f188ded6144`
+
+If you are using `nvim-treesitter` you can view your installed Go parser
+version with the following command:
+>
+    lua vim.print(io.open(require("nvim-treesitter.configs").get_parser_info_dir() .. "/go.revision"):read("*a"))
+<
+
+Using an untested parser version may or may not work in all scenarios. The
+plugin will not write the fix back to the buffer in the case the fix will
+generate an invalid parse tree. So an untested parser version will refuse to
+make fixes in some circumstances.
+
+==============================================================================
+4. CONFIGURATION                          *auto-fix-return.nvim-configuration*
+
+Setup function with defaults:
+>
+    require("auto-fix-return").setup({
+      -- Enable or disable the autofix on type behavior
+      enabled = true,
+      
+      -- Default logging level for the plugin, if the plugin does not behave as it should
+      -- set this to vim.log.levels.DEBUG
+      log_level = vim.log.levels.INFO
+    })
+<
+
+==============================================================================
+5. COMMANDS                                    *auto-fix-return.nvim-commands*
+
+                                                            *:AutoFixReturn*
+`:AutoFixReturn`        Format the function definition under the cursor, 
+                        adding or removing parenthesis as needed
+
+`:AutoFixReturn enable` Enable the autofix on type behavior
+
+`:AutoFixReturn disable` Disable the autofix on type behavior
+
+==============================================================================
+6. USAGE NOTES                              *auto-fix-return.nvim-usage-notes*
+
+IMPORTANT: The plugin attempts to add parenthesis as you type. Which means 
+that its mostly working off of invalid parse trees. This is very nice to use 
+but makes it very difficult to cover all edgecases from a parsing standpoint, 
+as different error states of the tree can be matched incorrectly.
+
+You can run the command `AutoFixReturn disable` to turn off the autocommand 
+and make whatever changes you need to that line. Then reenable the plugin 
+with `AutoFixReturn enable` and the line will not be edited unless you touch 
+the declarations return definition again.
+
+TIP: You can always invoke the fix manually with `AutoFixReturn` as long as 
+your cursor is in the return definition.
+
+NOTE: To ensure that we are not overly aggressive in the fixes that we apply
+and break unrelated code, whenever a fix is found, the contents of the current 
+buffer and the fix are first copied to a scratch buffer and a full TreeSitter 
+parse is run there before the fix is applied to the live buffer. If the buffer 
+with the proposed fix from the builder contains ANY parse errors in it the fix 
+will be ignored.
+
+This is because in rare cases treesitter error tokens can apply across an
+arbitrary number of rows and we would end up deleting large swathes of code 
+which is not what we want.
+
+In practice this means that an invalid syntax error elsewhere in the buffer 
+will essentially disable this plugin for that buffer.
+
+==============================================================================
+vim:tw=78:ts=8:noet:ft=help:norl:
