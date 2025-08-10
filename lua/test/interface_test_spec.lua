@@ -1152,4 +1152,38 @@ describe("test interface method declarations", function()
       end)
     end
   )
+
+  describe(
+    "when a struct return with space between struct keyword and braces is started",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value({
+          "type Foo interface {",
+          "  Bar() struct {}|",
+          "}",
+        })
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        local expected = {
+          "type Foo interface {",
+          "  Bar() struct {}",
+          "}",
+        }
+        eq(expected, lines)
+      end)
+
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 end)

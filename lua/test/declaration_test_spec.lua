@@ -1099,6 +1099,31 @@ describe("test functions with body defined", function()
       eq("{", char)
     end)
   end)
+
+  describe(
+    "when a struct with a space between the struct keyword and the braces with cursor at the end of the braces",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() struct {}| {}")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() struct {} {}", lines[1])
+      end)
+
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
+      end)
+    end
+  )
 end)
 
 describe("test functions without a body defined", function()
@@ -1831,6 +1856,31 @@ describe("test functions without a body defined", function()
       it("should not touch the cursor", function()
         local char = utils.get_cursor_char(winid)
         eq(",", char)
+      end)
+    end
+  )
+
+  describe(
+    "when a struct with a space between the struct keyword and the braces with cursor at the end of the braces",
+    function()
+      local winid = 0
+      before_each(function()
+        winid = utils.set_test_window_value("func Foo() struct {}|")
+        vim.cmd("AutoFixReturn")
+      end)
+
+      after_each(function()
+        utils.cleanup_test(winid)
+      end)
+
+      it("should not add parentheses around the return type", function()
+        local lines = utils.get_win_lines(winid)
+        eq("func Foo() struct {}", lines[1])
+      end)
+
+      it("should not touch the cursor", function()
+        local char = utils.get_cursor_char(winid)
+        eq("}", char)
       end)
     end
   )
